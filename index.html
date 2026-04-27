@@ -6,7 +6,8 @@
 <title>C949 — DSA Daily</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
-:root{--bg:#0e0e14;--surface:#16161f;--card:#1c1c28;--border:#2a2a3a;--accent:#7c3aed;--accent2:#06b6d4;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--text:#e2e8f0;--muted:#64748b;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif}
+:root{--bg:#0e0e14;--surface:#16161f;--card:#1c1c28;--border:#2a2a3a;--accent:#7c3aed;--accent2:#06b6d4;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--text:#e2e8f0;--muted:#94a3b8;--body-text:#c4cad6;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif}
+[data-theme="light"]{--bg:#f8f9fa;--surface:#ffffff;--card:#f1f3f5;--border:#dee2e6;--accent:#6d28d9;--accent2:#0891b2;--green:#059669;--red:#dc2626;--yellow:#d97706;--text:#1e293b;--muted:#475569;--body-text:#374151}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column;align-items:center}
 header{width:100%;max-width:480px;padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between}
@@ -24,7 +25,7 @@ header{width:100%;max-width:480px;padding:20px 20px 0;display:flex;align-items:c
 @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .lesson-tag{display:inline-block;font-size:.65rem;font-family:var(--mono);color:var(--accent2);background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);border-radius:6px;padding:3px 8px;margin-bottom:12px;letter-spacing:.05em;text-transform:uppercase}
 .lesson-title{font-size:1.1rem;font-weight:700;margin-bottom:10px;line-height:1.3}
-.lesson-body{font-size:.88rem;line-height:1.7;color:#b0b8c8;margin-bottom:16px;white-space:pre-line}
+.lesson-body{font-size:.88rem;line-height:1.7;color:var(--body-text);margin-bottom:16px;white-space:pre-line}
 .lesson-body strong{color:var(--accent2)}
 .code-block{background:#0a0a10;border:1px solid var(--border);border-radius:10px;padding:14px;font-family:var(--mono);font-size:.75rem;line-height:1.7;color:#a5f3fc;margin:12px 0;overflow-x:auto;white-space:pre}
 .diagram{background:#0a0a10;border:1px solid var(--border);border-radius:10px;padding:16px;margin:12px 0;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px}
@@ -122,6 +123,9 @@ header{width:100%;max-width:480px;padding:20px 20px 0;display:flex;align-items:c
 .lb-empty{text-align:center;color:var(--muted);font-size:.85rem;padding:40px 20px;line-height:1.7;}
 .lb-refresh{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:var(--mono);font-size:.75rem;cursor:pointer;transition:all .2s;margin-top:8px;}
 .lb-refresh:hover{border-color:var(--accent2);color:var(--accent2);}
+.theme-toggle{background:none;border:1px solid var(--border);border-radius:20px;padding:6px 10px;color:var(--muted);font-size:.8rem;cursor:pointer;transition:all .2s;font-family:var(--mono);line-height:1;}
+.theme-toggle:hover{border-color:var(--accent2);color:var(--accent2);}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 <script src="config.js"></script>
 </head>
@@ -165,13 +169,14 @@ header{width:100%;max-width:480px;padding:20px 20px 0;display:flex;align-items:c
       <div style="font-size:.68rem;font-family:var(--mono);color:var(--muted)" id="current-user-label">...</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
-      <button onclick="showScreen('lb-screen');loadLeaderboard();" style="background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.25);border-radius:20px;padding:6px 12px;font-family:var(--mono);font-size:.72rem;color:var(--accent2);cursor:pointer;">🏆 Board</button>
-      <div class="streak">🔥 <span id="streak-count">0</span></div>
+      <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Switch color theme">☀️</button>
+      <button onclick="showScreen('lb-screen');loadLeaderboard();" aria-label="View leaderboard" style="background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.25);border-radius:20px;padding:6px 12px;font-family:var(--mono);font-size:.72rem;color:var(--accent2);cursor:pointer;"><span aria-hidden="true">🏆</span> Board</button>
+      <div class="streak" aria-label="Streak counter"><span aria-hidden="true">🔥</span> <span id="streak-count">0</span></div>
     </div>
   </header>
   <div class="progress-wrap">
     <div class="progress-label"><span>OVERALL PROGRESS</span><span id="map-progress-label">0 / 17 done</span></div>
-    <div class="progress-bar"><div class="progress-fill" id="map-progress-fill" style="width:0%"></div></div>
+    <div class="progress-bar" role="progressbar" aria-label="Overall progress" aria-valuemin="0" aria-valuemax="17" aria-valuenow="0"><div class="progress-fill" id="map-progress-fill" style="width:0%"></div></div>
   </div>
   <div class="xp-row"><div class="xp-pill" id="total-xp">⭐ 0 XP</div><div class="xp-pill" id="review-pill" style="color:var(--accent2);display:none;">🔁 TAP ANY ✅ TO REVIEW</div></div>
   <div id="map-screen-inner">
@@ -186,9 +191,9 @@ header{width:100%;max-width:480px;padding:20px 20px 0;display:flex;align-items:c
 <!-- LESSON SCREEN -->
 <div id="lesson-screen" class="screen">
   <header>
-    <button onclick="showMap()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;padding:4px;">✕</button>
-    <div class="progress-bar" style="flex:1;margin:0 16px;"><div class="progress-fill" id="lesson-progress" style="width:0%"></div></div>
-    <div class="hearts" id="hearts-display">❤️❤️❤️</div>
+    <button onclick="showMap()" aria-label="Exit lesson" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;padding:4px;" aria-hidden="false">✕</button>
+    <div class="progress-bar" role="progressbar" aria-label="Lesson progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="flex:1;margin:0 16px;"><div class="progress-fill" id="lesson-progress" style="width:0%"></div></div>
+    <div class="hearts" id="hearts-display" aria-label="3 lives remaining" aria-live="polite">❤️❤️❤️</div>
   </header>
   <div class="lesson-container" id="lesson-container"></div>
   <div class="bottom-nav"><button class="check-btn" id="check-btn" onclick="handleCheck()" disabled>CHECK</button></div>
@@ -239,7 +244,8 @@ const MODULES = [
     xp: 20,
     steps: [
       { type:"lesson", tag:"EXPLAINS ALGORITHMS — 29%", title:"The 6 Properties of Every Algorithm",
-        body:`<strong>1. Finiteness</strong> — must end. No infinite loops.\n<strong>2. Definiteness</strong> — every step is exact and unambiguous.\n<strong>3. Input</strong> — one or more inputs from a valid range.\n<strong>4. Output</strong> — one or more defined results.\n<strong>5. Effectiveness</strong> — every step is doable with basic operations.\n<strong>6. Generality</strong> — solves a class of problems, not just one case.` },
+        body:`<strong>1. Finiteness</strong> — must end. No infinite loops.\n<strong>2. Definiteness</strong> — every step is exact and unambiguous.\n<strong>3. Input</strong> — one or more inputs from a valid range.\n<strong>4. Output</strong> — one or more defined results.\n<strong>5. Effectiveness</strong> — every step is doable with basic operations.\n<strong>6. Generality</strong> — solves a class of problems, not just one case.`,
+        code:`def find_max(arr):        # Input: any list of numbers\n    max_val = arr[0]      # Definiteness: clear first step\n    for x in arr:         # Finiteness: loop always ends\n        if x > max_val:\n            max_val = x\n    return max_val        # Output: one defined result\n# Generality: works for [3,1,9], [5,5], [-1,-2], ...` },
       { type:"lesson", tag:"ALGORITHM FACTORS", title:"8 Quality Factors",
         body:`WGU also tests these design qualities:\n\n<strong>Modularity</strong> — broken into small steps\n<strong>Correctness</strong> — produces right output for valid input\n<strong>Maintainability</strong> — easy to update without major changes\n<strong>Robustness</strong> — handles edge cases and bad input\n<strong>Simplicity</strong> — easy to understand\n<strong>Extensibility</strong> — other developers can build on it\n<strong>Functionality</strong> — solves real-world problems\n<strong>User-friendly</strong> — clear enough to explain to others` },
       { type:"mcq", prompt:"An algorithm that could run forever on bad input violates which property?",
@@ -935,7 +941,9 @@ function buildMap(){
   const done=state.completedModules.length;
   const total=MODULES.length;
   document.getElementById('map-progress-label').textContent=`${done} / ${total} done`;
-  document.getElementById('map-progress-fill').style.width=`${(done/total)*100}%`;
+  const mapFill=document.getElementById('map-progress-fill');
+  mapFill.style.width=`${(done/total)*100}%`;
+  mapFill.parentElement.setAttribute('aria-valuenow',done);
   document.getElementById('total-xp').textContent=`⭐ ${state.xp} XP`;
   const reviewPill=document.getElementById('review-pill');
   if(reviewPill) reviewPill.style.display=done>0?'block':'none';
@@ -1010,7 +1018,10 @@ function startLesson(moduleId,isReview=false){
 
 function renderStep(){
   const step=currentModule.steps[currentStep];
-  document.getElementById('lesson-progress').style.width=`${(currentStep/currentModule.steps.length)*100}%`;
+  const pct=Math.round((currentStep/currentModule.steps.length)*100);
+  const lessonBar=document.getElementById('lesson-progress');
+  lessonBar.style.width=`${pct}%`;
+  lessonBar.parentElement.setAttribute('aria-valuenow',pct);
   document.getElementById('hearts-display').textContent='❤️'.repeat(hearts)+'🖤'.repeat(3-hearts);
   const container=document.getElementById('lesson-container');
   container.innerHTML='';
@@ -1024,9 +1035,19 @@ function renderStep(){
 }
 
 function buildDiagram(d){
-  if(d.type==='array') return `<div class="diagram">${d.values.map((v,i)=>`<div class="node" style="border-radius:6px;">${v}<div style="font-size:.5rem;color:var(--muted);position:absolute;bottom:2px;">[${i}]</div></div>`).join('')}</div>`;
-  if(d.type==='linked') return `<div class="diagram">${d.values.map((v,i)=>`<div class="node">${v}</div>${i<d.values.length-1?'<div class="arrow">→</div>':'<div class="arrow" style="color:#ef4444">∅</div>'}`).join('')}</div>`;
-  if(d.type==='tree') return `<div class="diagram" style="flex-direction:column;gap:8px;"><div style="display:flex;justify-content:center;"><div class="node highlight">8</div></div><div style="display:flex;justify-content:center;gap:32px;"><div class="node">3</div><div class="node">10</div></div><div style="display:flex;justify-content:center;gap:8px;"><div class="node">1</div><div class="node">6</div><div class="node" style="opacity:.3">∅</div><div class="node">14</div></div><div style="font-size:.7rem;color:var(--muted);font-family:var(--mono);text-align:center;">left &lt; parent &lt; right</div></div>`;
+  const alt=d.alt||'';
+  if(d.type==='array'){
+    const label=alt||`Array with ${d.values.length} elements: ${d.values.join(', ')}`;
+    return `<figure class="diagram" aria-label="${label}" role="img">${d.values.map((v,i)=>`<div class="node" style="border-radius:6px;">${v}<div style="font-size:.5rem;color:var(--muted);position:absolute;bottom:2px;">[${i}]</div></div>`).join('')}</figure>`;
+  }
+  if(d.type==='linked'){
+    const label=alt||`Linked list: ${d.values.join(' → ')} → null`;
+    return `<figure class="diagram" aria-label="${label}" role="img">${d.values.map((v,i)=>`<div class="node">${v}</div>${i<d.values.length-1?'<div class="arrow" aria-hidden="true">→</div>':'<div class="arrow" style="color:#ef4444" aria-hidden="true">∅</div>'}`).join('')}</figure>`;
+  }
+  if(d.type==='tree'){
+    const label=alt||'Binary search tree with root 8, left subtree 3 (children 1, 6), right subtree 10 (child 14). Left nodes are less than parent; right nodes are greater.';
+    return `<figure class="diagram" style="flex-direction:column;gap:8px;" aria-label="${label}" role="img"><div style="display:flex;justify-content:center;"><div class="node highlight">8</div></div><div style="display:flex;justify-content:center;gap:32px;"><div class="node">3</div><div class="node">10</div></div><div style="display:flex;justify-content:center;gap:8px;"><div class="node">1</div><div class="node">6</div><div class="node" style="opacity:.3">∅</div><div class="node">14</div></div><div style="font-size:.7rem;color:var(--muted);font-family:var(--mono);text-align:center;" aria-hidden="true">left &lt; parent &lt; right</div></figure>`;
+  }
   return '';
 }
 
@@ -1050,8 +1071,9 @@ function renderLesson(step,container,btn){
 
 function renderMCQ(step,container,btn){
   const card=document.createElement('div');card.className='question-card';
-  const choices=step.choices.map((c,i)=>`<button class="choice-btn" onclick="selectChoice(${i})" id="choice-${i}"><span class="choice-letter">${['A','B','C','D'][i]}</span>${c}</button>`).join('');
-  card.innerHTML=`<div class="wgu-badge">🎓 WGU C949</div><div class="question-prompt">${step.prompt}</div><div class="choices">${choices}</div><div class="feedback" id="feedback"></div>`;
+  const letters=['A','B','C','D'];
+  const choices=step.choices.map((c,i)=>`<button class="choice-btn" onclick="selectChoice(${i})" id="choice-${i}" aria-label="Choice ${letters[i]}: ${c}"><span class="choice-letter" aria-hidden="true">${letters[i]}</span>${c}</button>`).join('');
+  card.innerHTML=`<div class="wgu-badge"><span aria-hidden="true">🎓</span> WGU C949</div><div class="question-prompt">${step.prompt}</div><div class="choices">${choices}</div><div class="feedback" id="feedback" aria-live="polite"></div>`;
   container.appendChild(card);
 }
 
@@ -1066,7 +1088,7 @@ function selectChoice(i){
 
 function renderFill(step,container,btn){
   const card=document.createElement('div');card.className='question-card';
-  card.innerHTML=`<div class="wgu-badge">🎓 WGU C949</div><div class="question-prompt">${step.prompt}</div><div class="fill-wrap">Answer: <input class="fill-input" id="fill-input" placeholder="type here..." oninput="document.getElementById('check-btn').disabled=this.value.trim()===''"></div><div class="feedback" id="feedback"></div>`;
+  card.innerHTML=`<div class="wgu-badge"><span aria-hidden="true">🎓</span> WGU C949</div><div class="question-prompt">${step.prompt}</div><div class="fill-wrap"><label for="fill-input" class="sr-only">Fill in the blank answer</label>Answer: <input class="fill-input" id="fill-input" aria-label="Fill in the blank answer" placeholder="type here..." oninput="document.getElementById('check-btn').disabled=this.value.trim()===''"></div><div class="feedback" id="feedback" aria-live="polite"></div>`;
   container.appendChild(card);
   setTimeout(()=>document.getElementById('fill-input')?.focus(),100);
 }
@@ -1077,7 +1099,7 @@ function renderMatch(step,container,btn){
   const card=document.createElement('div');card.className='question-card';
   const leftCol=matchPairs.map(p=>`<div class="match-item" id="left-${p.id}" onclick="matchClick('left',${p.id})">${p.left}</div>`).join('');
   const rightCol=shuffledRight.map(p=>`<div class="match-item" id="right-${p.id}" onclick="matchClick('right',${p.id})">${p.right}</div>`).join('');
-  card.innerHTML=`<div class="wgu-badge">🎓 WGU C949</div><div class="question-prompt">${step.prompt}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div><div class="match-col-label">TERM</div>${leftCol}</div><div><div class="match-col-label">DEFINITION</div>${rightCol}</div></div><div class="feedback" id="feedback"></div>`;
+  card.innerHTML=`<div class="wgu-badge"><span aria-hidden="true">🎓</span> WGU C949</div><div class="question-prompt">${step.prompt}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" role="group" aria-label="Matching exercise"><div><div class="match-col-label" aria-hidden="true">TERM</div>${leftCol}</div><div><div class="match-col-label" aria-hidden="true">DEFINITION</div>${rightCol}</div></div><div class="feedback" id="feedback" aria-live="polite"></div>`;
   container.appendChild(card);btn.disabled=true;
 }
 
@@ -1194,8 +1216,26 @@ function showScreen(id){
   const el=document.getElementById(id);el.classList.add('active');el.style.display='flex';
 }
 
+// ── THEME ──
+function toggleTheme(){
+  const html=document.documentElement;
+  const next=html.getAttribute('data-theme')==='light'?'dark':'light';
+  applyTheme(next);
+  localStorage.setItem('c949_theme',next);
+}
+
+function applyTheme(theme){
+  const html=document.documentElement;
+  if(theme==='light') html.setAttribute('data-theme','light');
+  else html.removeAttribute('data-theme');
+  const btn=document.getElementById('theme-toggle-btn');
+  if(btn) btn.textContent=theme==='light'?'🌙':'☀️';
+  if(btn) btn.setAttribute('aria-label',theme==='light'?'Switch to dark mode':'Switch to light mode');
+}
+
 // ── INIT ──
 (function init(){
+  applyTheme(localStorage.getItem('c949_theme')||'dark');
   renderSavedUsers();
   showScreen('name-screen');
   setTimeout(()=>document.getElementById('name-input')?.focus(), 300);
