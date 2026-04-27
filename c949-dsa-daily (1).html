@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C949 — DSA Daily</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
+:root{--bg:#0e0e14;--surface:#16161f;--card:#1c1c28;--border:#2a2a3a;--accent:#7c3aed;--accent2:#06b6d4;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--text:#e2e8f0;--muted:#64748b;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+header{width:100%;max-width:480px;padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--mono);font-size:1rem;color:var(--accent2);letter-spacing:.05em}
+.streak{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-family:var(--mono);font-size:.8rem;color:var(--yellow)}
+.progress-wrap{width:100%;max-width:480px;padding:16px 20px 0}
+.progress-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:6px;font-family:var(--mono)}
+.progress-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .5s ease}
+.xp-row{width:100%;max-width:480px;padding:8px 20px 0;display:flex;gap:8px;align-items:center}
+.xp-pill{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px 10px;font-size:.72rem;font-family:var(--mono);color:var(--green)}
+.hearts{display:flex;gap:3px;font-size:.9rem}
+.lesson-container{width:100%;max-width:480px;padding:16px 20px 100px;flex:1}
+.lesson-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;animation:slideUp .3s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.lesson-tag{display:inline-block;font-size:.65rem;font-family:var(--mono);color:var(--accent2);background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);border-radius:6px;padding:3px 8px;margin-bottom:12px;letter-spacing:.05em;text-transform:uppercase}
+.lesson-title{font-size:1.1rem;font-weight:700;margin-bottom:10px;line-height:1.3}
+.lesson-body{font-size:.88rem;line-height:1.7;color:#b0b8c8;margin-bottom:16px;white-space:pre-line}
+.lesson-body strong{color:var(--accent2)}
+.code-block{background:#0a0a10;border:1px solid var(--border);border-radius:10px;padding:14px;font-family:var(--mono);font-size:.75rem;line-height:1.7;color:#a5f3fc;margin:12px 0;overflow-x:auto;white-space:pre}
+.diagram{background:#0a0a10;border:1px solid var(--border);border-radius:10px;padding:16px;margin:12px 0;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px}
+.node{width:44px;height:44px;border-radius:8px;background:var(--surface);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--accent2);position:relative;transition:all .3s}
+.node.highlight{border-color:var(--green);color:var(--green);background:rgba(16,185,129,.1);transform:scale(1.15)}
+.arrow{color:var(--muted);font-size:1.1rem;padding:0 2px}
+.question-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;animation:slideUp .3s ease}
+.question-prompt{font-size:1rem;font-weight:600;margin-bottom:18px;line-height:1.45}
+.question-prompt code{font-family:var(--mono);background:#0a0a10;color:var(--accent2);padding:2px 6px;border-radius:4px;font-size:.85rem}
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice-btn{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:14px 16px;text-align:left;color:var(--text);font-family:var(--sans);font-size:.88rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px}
+.choice-btn:hover{border-color:var(--accent);background:rgba(124,58,237,.08)}
+.choice-btn.correct{border-color:var(--green);background:rgba(16,185,129,.12);color:var(--green)}
+.choice-btn.wrong{border-color:var(--red);background:rgba(239,68,68,.1);color:var(--red)}
+.choice-letter{width:26px;height:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:700;flex-shrink:0}
+.fill-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:.9rem;line-height:2.2}
+.fill-input{background:var(--surface);border:2px solid var(--accent);border-radius:8px;padding:6px 12px;color:var(--text);font-family:var(--mono);font-size:.88rem;width:150px;outline:none;transition:border-color .2s}
+.fill-input:focus{border-color:var(--accent2)}
+.fill-input.correct{border-color:var(--green);color:var(--green)}
+.fill-input.wrong{border-color:var(--red);color:var(--red)}
+.match-item{background:var(--surface);border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.82rem;cursor:pointer;transition:all .2s;text-align:center}
+.match-item:hover{border-color:var(--accent)}
+.match-item.selected{border-color:var(--accent);background:rgba(124,58,237,.15)}
+.match-item.matched{border-color:var(--green);background:rgba(16,185,129,.1);color:var(--green);pointer-events:none}
+.match-col-label{font-size:.68rem;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.feedback{margin-top:16px;border-radius:12px;padding:14px 16px;font-size:.85rem;line-height:1.55;display:none;animation:slideUp .25s ease}
+.feedback.correct-fb{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7;display:block}
+.feedback.wrong-fb{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#fca5a5;display:block}
+.bottom-nav{position:fixed;bottom:0;width:100%;max-width:480px;padding:12px 20px 24px;background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.check-btn{width:100%;padding:16px;border-radius:14px;border:none;background:var(--accent);color:white;font-family:var(--sans);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.02em}
+.check-btn:hover{background:#6d28d9;transform:translateY(-1px)}
+.check-btn:active{transform:translateY(0)}
+.check-btn.next{background:var(--green)}
+.check-btn.next:hover{background:#059669}
+.check-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none}
+#map-screen-inner{width:100%;max-width:480px;padding:20px 20px 100px}
+.map-title{font-family:var(--mono);font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px}
+.module-node{width:62px;height:62px;border-radius:50%;border:3px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;font-size:1.3rem;flex-shrink:0}
+.module-node.done{border-color:var(--green);background:rgba(16,185,129,.12)}
+.module-node.active{border-color:var(--accent);background:rgba(124,58,237,.15);box-shadow:0 0 20px rgba(124,58,237,.3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(124,58,237,.3)}50%{box-shadow:0 0 30px rgba(124,58,237,.6)}}
+.module-node.locked{border-color:var(--border);opacity:.4;cursor:not-allowed}
+.module-connector{width:3px;height:20px;background:var(--border);border-radius:2px;margin-left:29px}
+.module-connector.done{background:var(--green)}
+.map-grid{display:flex;flex-direction:column}
+#complete-screen{width:100%;max-width:480px;padding:40px 20px;text-align:center;display:none}
+.complete-emoji{font-size:4rem;margin-bottom:16px}
+.complete-title{font-size:1.5rem;font-weight:700;margin-bottom:8px}
+.complete-sub{color:var(--muted);font-size:.9rem;margin-bottom:32px}
+.xp-award{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px}
+.xp-award-num{font-family:var(--mono);font-size:2.5rem;font-weight:700;color:var(--green)}
+.xp-award-label{color:var(--muted);font-size:.85rem;margin-top:4px}
+.screen{display:none}
+.screen.active{display:flex;flex-direction:column;align-items:center;width:100%}
+.wgu-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:20px;padding:4px 12px;font-size:.7rem;font-family:var(--mono);color:var(--accent);margin-bottom:16px;text-transform:uppercase;letter-spacing:.06em}
+
+/* ── NAME ENTRY SCREEN ── */
+.name-screen{width:100%;max-width:480px;padding:60px 28px 40px;display:flex;flex-direction:column;align-items:center;gap:0;}
+.name-logo{font-family:var(--mono);font-size:1.1rem;color:var(--accent2);letter-spacing:.08em;margin-bottom:8px;}
+.name-title{font-size:1.6rem;font-weight:700;text-align:center;margin-bottom:8px;line-height:1.3;}
+.name-sub{font-size:.85rem;color:var(--muted);text-align:center;margin-bottom:32px;line-height:1.6;max-width:320px;}
+.name-input{width:100%;background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:16px 18px;color:var(--text);font-family:var(--sans);font-size:1.1rem;outline:none;text-align:center;transition:border-color .2s;margin-bottom:12px;}
+.name-input:focus{border-color:var(--accent2);}
+.name-input::placeholder{color:var(--muted);}
+.name-btn{width:100%;padding:16px;border-radius:14px;border:none;background:var(--accent);color:white;font-family:var(--sans);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;margin-bottom:24px;}
+.name-btn:hover{background:#6d28d9;transform:translateY(-1px);}
+.name-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none;}
+.saved-users{width:100%;margin-top:4px;}
+.saved-label{font-size:.68rem;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;text-align:center;}
+.user-chip{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;cursor:pointer;transition:all .2s;}
+.user-chip:hover{border-color:var(--accent);background:rgba(124,58,237,.08);}
+.user-chip-info{display:flex;flex-direction:column;gap:3px;}
+.user-chip-name{font-size:.9rem;font-weight:600;}
+.user-chip-stats{font-size:.7rem;font-family:var(--mono);color:var(--muted);}
+.user-chip-arrow{color:var(--muted);font-size:1rem;}
+
+/* ── LEADERBOARD SCREEN ── */
+.lb-screen{width:100%;max-width:480px;padding:20px 20px 80px;}
+.lb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.lb-title{font-family:var(--mono);font-size:.85rem;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em;}
+.lb-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:4px;}
+.lb-loading{text-align:center;color:var(--muted);font-family:var(--mono);font-size:.8rem;padding:40px 0;}
+.lb-row{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;transition:all .2s;}
+.lb-row.me{border-color:var(--accent);background:rgba(124,58,237,.08);}
+.lb-rank{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--muted);width:28px;text-align:center;flex-shrink:0;}
+.lb-rank.gold{color:#fbbf24;}
+.lb-rank.silver{color:#94a3b8;}
+.lb-rank.bronze{color:#d97706;}
+.lb-info{flex:1;}
+.lb-name{font-size:.92rem;font-weight:600;margin-bottom:3px;}
+.lb-meta{font-size:.72rem;font-family:var(--mono);color:var(--muted);}
+.lb-xp{font-family:var(--mono);font-size:.95rem;font-weight:700;color:var(--green);}
+.lb-bar-wrap{width:100%;background:var(--border);border-radius:4px;height:4px;margin-top:6px;}
+.lb-bar{height:4px;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s ease;}
+.lb-empty{text-align:center;color:var(--muted);font-size:.85rem;padding:40px 20px;line-height:1.7;}
+.lb-refresh{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:var(--mono);font-size:.75rem;cursor:pointer;transition:all .2s;margin-top:8px;}
+.lb-refresh:hover{border-color:var(--accent2);color:var(--accent2);}
+</style>
+</head>
+<body>
+
+<!-- NAME ENTRY SCREEN -->
+<div id="name-screen" class="screen active">
+  <div class="name-screen">
+    <div class="name-logo">C949 // DSA DAILY</div>
+    <div class="name-title">Who's studying?</div>
+    <div class="name-sub">Enter your name and email to save your progress and appear on the leaderboard.</div>
+    <input class="name-input" id="name-input" placeholder="Your first name..." maxlength="20"
+      oninput="validateNameForm()"
+      onkeydown="if(event.key==='Enter')document.getElementById('email-input').focus()">
+    <input class="name-input" id="email-input" placeholder="Email address (required)" maxlength="80" type="email"
+      style="margin-top:-4px;"
+      oninput="validateNameForm()"
+      onkeydown="if(event.key==='Enter')startAsUser()">
+    <button class="name-btn" id="name-start-btn" onclick="startAsUser()" disabled>LET'S GO →</button>
+    <div class="saved-users" id="saved-users-list"></div>
+  </div>
+</div>
+
+<!-- LEADERBOARD SCREEN -->
+<div id="lb-screen" class="screen">
+  <div class="lb-screen">
+    <div class="lb-header">
+      <div class="lb-title">🏆 Leaderboard</div>
+      <button class="lb-close" onclick="showMap()">✕ Back</button>
+    </div>
+    <div id="lb-content"><div class="lb-loading">Loading...</div></div>
+    <button class="lb-refresh" onclick="loadLeaderboard()">↻ Refresh</button>
+  </div>
+</div>
+
+<!-- MAP SCREEN -->
+<div id="map-screen" class="screen active">
+  <header>
+    <div style="display:flex;flex-direction:column;gap:2px;">
+      <div class="logo">C949 // DSA DAILY</div>
+      <div style="font-size:.68rem;font-family:var(--mono);color:var(--muted)" id="current-user-label">...</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button onclick="showScreen('lb-screen');loadLeaderboard();" style="background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.25);border-radius:20px;padding:6px 12px;font-family:var(--mono);font-size:.72rem;color:var(--accent2);cursor:pointer;">🏆 Board</button>
+      <div class="streak">🔥 <span id="streak-count">0</span></div>
+    </div>
+  </header>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>OVERALL PROGRESS</span><span id="map-progress-label">0 / 17 done</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="map-progress-fill" style="width:0%"></div></div>
+  </div>
+  <div class="xp-row"><div class="xp-pill" id="total-xp">⭐ 0 XP</div><div class="xp-pill" id="review-pill" style="color:var(--accent2);display:none;">🔁 TAP ANY ✅ TO REVIEW</div></div>
+  <div id="map-screen-inner">
+    <div class="map-title">C949 — FULL STUDY GUIDE (17 MODULES)</div>
+    <div style="background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:.78rem;color:#94a3b8;line-height:1.5;">
+      <span style="color:var(--accent2);font-weight:700;">One month. One shot.</span> Completed modules stay clickable — tap any ✅ to review it as many times as you need.
+    </div>
+    <div class="map-grid" id="module-map"></div>
+  </div>
+</div>
+
+<!-- LESSON SCREEN -->
+<div id="lesson-screen" class="screen">
+  <header>
+    <button onclick="showMap()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;padding:4px;">✕</button>
+    <div class="progress-bar" style="flex:1;margin:0 16px;"><div class="progress-fill" id="lesson-progress" style="width:0%"></div></div>
+    <div class="hearts" id="hearts-display">❤️❤️❤️</div>
+  </header>
+  <div class="lesson-container" id="lesson-container"></div>
+  <div class="bottom-nav"><button class="check-btn" id="check-btn" onclick="handleCheck()" disabled>CHECK</button></div>
+</div>
+
+<!-- COMPLETE SCREEN -->
+<div id="complete-screen" class="screen">
+  <div class="complete-emoji" id="complete-emoji">🏆</div>
+  <div class="complete-title" id="complete-title">Lesson Complete!</div>
+  <div class="complete-sub" id="complete-sub">You crushed it.</div>
+  <div class="xp-award"><div class="xp-award-num" id="xp-earned">+20 XP</div><div class="xp-award-label">earned this lesson</div></div>
+  <button class="check-btn next" onclick="showMap()" style="max-width:480px;width:90%;">BACK TO MAP</button>
+</div>
+
+<script>
+const MODULES = [
+  {
+    id: 0, emoji: "📊", title: "Big-O Notation",
+    desc: "Time & space complexity — the language of efficiency",
+    xp: 20,
+    steps: [
+      { type:"lesson", tag:"CONCEPT", title:"What is Big-O?",
+        body:`Big-O describes <strong>how runtime grows</strong> as input size <strong>n</strong> grows. We always focus on worst-case.\n\nDrop constants and lower-order terms — only the dominant term matters.\n<strong>O(2n)</strong> simplifies to <strong>O(n)</strong>. <strong>O(n²+n)</strong> simplifies to <strong>O(n²)</strong>.` },
+      { type:"lesson", tag:"THE CHEAT SHEET", title:"The 7 Complexities You Must Know",
+        body:`<strong>O(1)</strong> — Constant. Array index access.\n<strong>O(log n)</strong> — Halves each step. Binary search.\n<strong>O(n)</strong> — One loop. Linear search.\n<strong>O(n log n)</strong> — Merge sort, Heap sort.\n<strong>O(n²)</strong> — Nested loops. Bubble sort.\n<strong>O(2ⁿ)</strong> — Exponential. Brute force.\n<strong>O(n!)</strong> — Factorial. Permutations.`,
+        code:`x = arr[0]          # O(1)\nfor i in arr: ...   # O(n)\nfor i in arr:\n  for j in arr: ... # O(n²)` },
+      { type:"mcq", prompt:"A function loops through an array once. Time complexity?",
+        choices:["O(1)","O(log n)","O(n)","O(n²)"], correct:2,
+        feedback_correct:"✅ O(n) — one loop visits each element once. Linear time.",
+        feedback_wrong:"❌ One loop = O(n). Runtime grows linearly with input." },
+      { type:"mcq", prompt:"Two nested loops both iterate n elements. Big-O?",
+        choices:["O(n)","O(2n)","O(n²)","O(log n)"], correct:2,
+        feedback_correct:"✅ O(n²)! Nested loops multiply: n × n.",
+        feedback_wrong:"❌ Nested loops = O(n²). Each of n items triggers n more operations." },
+      { type:"fill", prompt:"Binary search halves the input each step. Its complexity is O(___)",
+        answer:"log n", accepts:["log n","logn","O(log n)","log(n)"],
+        feedback_correct:"✅ O(log n)! Halving = logarithmic. 1M items needs only ~20 steps.",
+        feedback_wrong:"❌ Answer: log n. Halving each step = O(log n)." },
+      { type:"mcq", prompt:"O(n² + n + 5) simplifies to ___",
+        choices:["O(n)","O(n²)","O(n + 5)","O(2n²)"], correct:1,
+        feedback_correct:"✅ O(n²) — drop lower-order terms and constants. Dominant term wins.",
+        feedback_wrong:"❌ Drop constants and lower terms. n² dominates everything else." }
+    ]
+  },
+  {
+    id: 1, emoji: "🧩", title: "Algorithm Properties",
+    desc: "The 6 characteristics every algorithm must have — WGU tests these by name",
+    xp: 20,
+    steps: [
+      { type:"lesson", tag:"EXPLAINS ALGORITHMS — 29%", title:"The 6 Properties of Every Algorithm",
+        body:`<strong>1. Finiteness</strong> — must end. No infinite loops.\n<strong>2. Definiteness</strong> — every step is exact and unambiguous.\n<strong>3. Input</strong> — one or more inputs from a valid range.\n<strong>4. Output</strong> — one or more defined results.\n<strong>5. Effectiveness</strong> — every step is doable with basic operations.\n<strong>6. Generality</strong> — solves a class of problems, not just one case.` },
+      { type:"lesson", tag:"ALGORITHM FACTORS", title:"8 Quality Factors",
+        body:`WGU also tests these design qualities:\n\n<strong>Modularity</strong> — broken into small steps\n<strong>Correctness</strong> — produces right output for valid input\n<strong>Maintainability</strong> — easy to update without major changes\n<strong>Robustness</strong> — handles edge cases and bad input\n<strong>Simplicity</strong> — easy to understand\n<strong>Extensibility</strong> — other developers can build on it\n<strong>Functionality</strong> — solves real-world problems\n<strong>User-friendly</strong> — clear enough to explain to others` },
+      { type:"mcq", prompt:"An algorithm that could run forever on bad input violates which property?",
+        choices:["Definiteness","Finiteness","Generality","Effectiveness"], correct:1,
+        feedback_correct:"✅ Finiteness! Every algorithm must terminate — no infinite loops allowed.",
+        feedback_wrong:"❌ Finiteness — an algorithm must always reach a defined endpoint." },
+      { type:"mcq", prompt:"An algorithm only works for the number 7 and fails for all other inputs. It fails ___",
+        choices:["Finiteness","Effectiveness","Generality","Definiteness"], correct:2,
+        feedback_correct:"✅ Generality! Algorithms must solve a class of problems, not just one specific case.",
+        feedback_wrong:"❌ Generality — algorithms must work for a range of valid inputs, not just one." },
+      { type:"mcq", prompt:"Which algorithm type explores ALL possible solutions exhaustively?",
+        choices:["Greedy","Recursive","Brute Force","Dynamic Programming"], correct:2,
+        feedback_correct:"✅ Brute Force! Tries every possible solution. Simple but often impractical for large inputs.",
+        feedback_wrong:"❌ Brute Force — exhaustively tries all possibilities. Works but is often slow." },
+      { type:"match", prompt:"Match each algorithm type to its description:",
+        pairs:[
+          {left:"Greedy", right:"Locally optimal each step"},
+          {left:"Recursive", right:"Calls itself on sub-problems"},
+          {left:"Divide & Conquer", right:"Split, solve, combine"},
+        ],
+        feedback_correct:"✅ Greedy = local optimum. Recursive = self-calling. Divide & Conquer = split-solve-merge.",
+        feedback_wrong:"❌ Greedy picks best local option. Recursive calls itself. Divide & Conquer splits problems." }
+    ]
+  },
+  {
+    id: 2, emoji: "🔁", title: "Recursion",
+    desc: "Functions that call themselves — base case, recursive case, call stack",
+    xp: 20,
+    steps: [
+      { type:"lesson", tag:"CONCEPT", title:"How Recursion Works",
+        body:`A recursive function calls <strong>itself</strong> to solve smaller versions of the same problem.\n\n<strong>Base Case</strong> — stops the recursion. Solved directly.\n<strong>Recursive Case</strong> — calls itself with a smaller input.\n<strong>Call Stack</strong> — each call is stacked up, then unwound.`,
+        code:`def factorial(n):\n    if n == 0:          # Base Case\n        return 1\n    return n * factorial(n-1)  # Recursive Case\n\n# factorial(3) → 3 * factorial(2)\n#              → 3 * 2 * factorial(1)\n#              → 3 * 2 * 1 * factorial(0)\n#              → 3 * 2 * 1 * 1 = 6` },
+      { type:"mcq", prompt:"What happens if a recursive function has NO base case?",
+        choices:["It returns 0","It runs once","Stack overflow / infinite loop","It skips recursion"],
+        correct:2,
+        feedback_correct:"✅ Stack overflow! Without a base case, it calls itself forever until memory runs out.",
+        feedback_wrong:"❌ No base case = infinite recursion = stack overflow. Always define your base case!" },
+      { type:"mcq", prompt:"In factorial(5), which call is the BASE CASE?",
+        choices:["factorial(5)","factorial(3)","factorial(1)","factorial(0)"], correct:3,
+        feedback_correct:"✅ factorial(0) = 1. That's the base case — it returns directly without another call.",
+        feedback_wrong:"❌ factorial(0) is the base case. It returns 1 without calling itself again." },
+      { type:"fill", prompt:"Recursion is best when a problem can be divided into ________ sub-problems",
+        answer:"similar", accepts:["similar","smaller","identical","recursive","same"],
+        feedback_correct:"✅ Similar sub-problems! That's the definition of a naturally recursive problem.",
+        feedback_wrong:"❌ Similar (or smaller/identical) sub-problems. Recursion shines when the structure repeats." },
+      { type:"mcq", prompt:"Recursion disadvantage: each function call adds a frame to the ___",
+        choices:["Heap","Queue","Call Stack","Hash Table"], correct:2,
+        feedback_correct:"✅ Call Stack! Deep recursion can cause stack overflow if too many frames build up.",
+        feedback_wrong:"❌ Call Stack. Each recursive call adds a frame — too many = stack overflow." }
+    ]
+  },
+  {
+    id: 3, emoji: "🔍", title: "Searching Algorithms",
+    desc: "Linear, Binary, Interpolation, DFS, BFS — with best/avg/worst cases",
+    xp: 25,
+    steps: [
+      { type:"lesson", tag:"SEARCH", title:"Linear vs Binary Search",
+        body:`<strong>Linear Search</strong> — checks every element one by one.\n✅ Works on unsorted data\n❌ O(n) worst case\n\n<strong>Binary Search</strong> — halves the search space each step.\n✅ O(log n) worst case\n❌ Requires SORTED array`,
+        code:`# Linear Search — O(n)\ndef linear_search(arr, target):\n    for i in range(len(arr)):\n        if arr[i] == target: return i\n    return -1\n\n# Binary Search — O(log n)\ndef binary_search(arr, target):\n    low, high = 0, len(arr)-1\n    while low <= high:\n        mid = (low + high) // 2\n        if arr[mid] == target: return mid\n        elif arr[mid] < target: low = mid + 1\n        else: high = mid - 1\n    return -1` },
+      { type:"lesson", tag:"BEST / AVG / WORST", title:"Search Complexity Cases",
+        body:`<strong>Linear Search:</strong>\n• Best: O(1) — target is first element\n• Average: O(n) — target somewhere in middle\n• Worst: O(n) — target is last or not present\n\n<strong>Binary Search:</strong>\n• Best: O(1) — target is the middle element\n• Average: O(log n)\n• Worst: O(log n) — target at extreme end\n\n<strong>Interpolation Search:</strong>\n• Best: O(1), Average: O(log log n), Worst: O(n)\n• Works best on uniformly distributed data` },
+      { type:"mcq", prompt:"You need to search an UNSORTED array. Which algorithm must you use?",
+        choices:["Binary Search","Interpolation Search","Linear Search","DFS"], correct:2,
+        feedback_correct:"✅ Linear Search! Binary search requires sorted data. Linear works on anything.",
+        feedback_wrong:"❌ Linear Search. Binary search requires a sorted array — can't use it on unsorted data." },
+      { type:"mcq", prompt:"Binary search on array {45,77,89,90,94,99,100} looking for 100. First mid index?",
+        choices:["Index 2 (89)","Index 3 (90)","Index 4 (94)","Index 6 (100)"], correct:1,
+        feedback_correct:"✅ mid = (0+6)//2 = 3, arr[3] = 90. Since 100 > 90, search right half next.",
+        feedback_wrong:"❌ mid = (low+high)//2 = (0+6)//2 = 3. arr[3] = 90. Then low becomes 4." },
+      { type:"lesson", tag:"GRAPH SEARCH", title:"DFS and BFS",
+        body:`<strong>DFS (Depth-First Search)</strong> — explores as far as possible along one branch before backtracking.\n• Uses a <strong>Stack</strong> (or recursion)\n• Time: O(V+E)\n\n<strong>BFS (Breadth-First Search)</strong> — explores all neighbors at current depth before going deeper.\n• Uses a <strong>Queue</strong>\n• Time: O(V+E)\n• Best for finding SHORTEST PATH` },
+      { type:"mcq", prompt:"BFS uses a ___ to track which nodes to visit next.",
+        choices:["Stack","Queue","Heap","Array"], correct:1,
+        feedback_correct:"✅ Queue! BFS visits level by level — FIFO order. First in = first explored.",
+        feedback_wrong:"❌ Queue (FIFO). BFS explores neighbors level by level — first discovered = first visited." },
+      { type:"match", prompt:"Match each search to its data structure:",
+        pairs:[
+          {left:"DFS", right:"Stack"},
+          {left:"BFS", right:"Queue"},
+          {left:"Binary Search", right:"Sorted Array"},
+        ],
+        feedback_correct:"✅ DFS=Stack, BFS=Queue, Binary Search=Sorted Array. Classic WGU exam combos.",
+        feedback_wrong:"❌ DFS uses a Stack. BFS uses a Queue. Binary Search needs a Sorted Array." }
+    ]
+  },
+  {
+    id: 4, emoji: "🔀", title: "Sorting Algorithms",
+    desc: "All 9 sorts — identify by signature, know their complexities",
+    xp: 30,
+    steps: [
+      { type:"lesson", tag:"WGU EXAM KEY", title:"Identify Sorts by Signature",
+        body:`WGU gives pseudocode — you name the algorithm. Learn these signatures:\n\n🫧 <strong>Bubble</strong> — swaps adjacent elements\n🎯 <strong>Selection</strong> — finds minimum, swaps to front\n📥 <strong>Insertion</strong> — builds sorted portion one item at a time\n✂️ <strong>Merge</strong> — splits in half, merges\n🎯 <strong>Quick</strong> — pivot keyword\n🏔️ <strong>Heap</strong> — heapify / extract max\n🪣 <strong>Bucket</strong> — distributes into buckets\n🔢 <strong>Radix</strong> — sorts digit by digit (LSD/MSD)\n📊 <strong>Counting</strong> — counts occurrences` },
+      { type:"lesson", tag:"BIG-O TABLE", title:"Sort Complexities — Memorize This",
+        body:`| Sort | Best | Average | Worst |\n<strong>Bubble</strong> | O(n) | O(n²) | O(n²)\n<strong>Selection</strong> | O(n²) | O(n²) | O(n²)\n<strong>Insertion</strong> | O(n) | O(n²) | O(n²)\n<strong>Merge</strong> | O(n log n) | O(n log n) | O(n log n)\n<strong>Quick</strong> | O(n log n) | O(n log n) | O(n²)\n<strong>Heap</strong> | O(n log n) | O(n log n) | O(n log n)\n<strong>Bucket</strong> | O(n+k) | O(n+k) | O(n²)\n<strong>Counting</strong> | O(n+k) | O(n+k) | O(n+k)\n<strong>Radix</strong> | O(nk) | O(nk) | O(nk)` },
+      { type:"mcq", prompt:"Pseudocode uses 'pivot' to partition an array. This is ___",
+        choices:["Merge Sort","Bubble Sort","Quicksort","Bucket Sort"], correct:2,
+        feedback_correct:"✅ Quicksort! 'pivot' is its one-word signature. Always look for it.",
+        feedback_wrong:"❌ Pivot = Quicksort. That single keyword identifies it every time." },
+      { type:"mcq", prompt:"An algorithm repeatedly finds the MINIMUM element and swaps it to the front. This is ___",
+        choices:["Bubble Sort","Insertion Sort","Selection Sort","Merge Sort"], correct:2,
+        feedback_correct:"✅ Selection Sort! Select minimum → swap with start. Always O(n²) regardless of input.",
+        feedback_wrong:"❌ Selection Sort — finds minimum, moves it to position. Keywords: 'select minimum, swap'." },
+      { type:"mcq", prompt:"Which sort has O(n log n) in ALL cases — best, average, AND worst?",
+        choices:["Quicksort","Bubble Sort","Merge Sort","Insertion Sort"], correct:2,
+        feedback_correct:"✅ Merge Sort! Always O(n log n). Consistent performance is its strength.",
+        feedback_wrong:"❌ Merge Sort — always O(n log n). Quicksort degrades to O(n²) in worst case." },
+      { type:"mcq", prompt:"Quicksort's WORST case O(n²) happens when ___",
+        choices:["Array is random","Pivot is always median","Pivot is always smallest or largest","Array has duplicates"],
+        correct:2,
+        feedback_correct:"✅ Bad pivot selection! If pivot is always min or max, partitions are unbalanced → O(n²).",
+        feedback_wrong:"❌ Worst case = pivot always picks the smallest or largest element = unbalanced partitions." },
+      { type:"match", prompt:"Match each sort to its identifying keyword:",
+        pairs:[
+          {left:"Bubble Sort", right:"Swap adjacent"},
+          {left:"Radix Sort", right:"Digit by digit"},
+          {left:"Heap Sort", right:"Heapify"},
+        ],
+        feedback_correct:"✅ Bubble=swap adjacent, Radix=digit sorting, Heap=heapify. These are WGU exam keywords.",
+        feedback_wrong:"❌ Bubble sorts by swapping neighbors. Radix processes digits. Heap uses heapify." }
+    ]
+  },
+  {
+    id: 5, emoji: "📦", title: "Arrays & Linked Lists",
+    desc: "Contiguous vs pointer-based storage — operations and complexity",
+    xp: 20,
+    steps: [
+      { type:"lesson", tag:"DATA STRUCTURE", title:"Arrays",
+        body:`Arrays store items in <strong>contiguous memory</strong>. Access any element instantly by index.\n\n✅ Access: O(1)\n✅ Insert at end: O(1) amortized\n❌ Insert at index: O(n) — must shift\n❌ Delete at index: O(n) — must shift\n✅ Binary search: O(log n) if sorted`,
+        diagram:{type:"array", values:[12,7,3,18,5]} },
+      { type:"lesson", tag:"DATA STRUCTURE", title:"Linked Lists",
+        body:`Nodes store data + pointer to next node. No contiguous memory.\n\n<strong>Singly</strong> — each node points forward only\n<strong>Doubly</strong> — each node points forward AND back\n<strong>Circular</strong> — last node points back to first\n\n✅ Insert at head: O(1)\n✅ Insert at tail (with tail pointer): O(1)\n❌ Access by index: O(n) — must traverse\n❌ Search: O(n)`,
+        diagram:{type:"linked", values:[12,7,3,18]} },
+      { type:"mcq", prompt:"You need to access the 500th item instantly. Which is better?",
+        choices:["Linked List","Array","Both equal","Hash Table"], correct:1,
+        feedback_correct:"✅ Array! arr[499] = O(1). Direct memory address calculation.",
+        feedback_wrong:"❌ Array wins. Direct index access = O(1). Linked list requires O(n) traversal." },
+      { type:"mcq", prompt:"Inserting at the BEGINNING of a linked list is ___",
+        choices:["O(n²)","O(n)","O(log n)","O(1)"], correct:3,
+        feedback_correct:"✅ O(1)! New node → points to old head → done. No shifting needed.",
+        feedback_wrong:"❌ O(1). Just redirect the head pointer. No other nodes touched." },
+      { type:"mcq", prompt:"Python's built-in 'list' is equivalent to which data structure?",
+        choices:["Linked List","Array","Hash Table","Stack"], correct:1,
+        feedback_correct:"✅ Array (dynamic array)! Python lists store elements in contiguous memory.",
+        feedback_wrong:"❌ Python list = Array. Contiguous memory, O(1) index access." }
+    ]
+  },
+  {
+    id: 6, emoji: "📚", title: "Stacks, Queues & Deque",
+    desc: "LIFO, FIFO, and double-ended — all operations are O(1)",
+    xp: 20,
+    steps: [
+      { type:"lesson", tag:"ADT", title:"Stack — LIFO",
+        body:`Stack = <strong>Last In, First Out</strong>. Like a stack of plates.\n\n<strong>push()</strong> — add to top: O(1)\n<strong>pop()</strong> — remove from top: O(1)\n<strong>peek()</strong> — see top without removing: O(1)\n<strong>isEmpty()</strong> — check if empty: O(1)\n\n📌 Use cases: browser back button, undo, recursion call stack`,
+        code:`stack = []\nstack.append(1)   # push\nstack.append(2)\nstack.append(3)\ntop = stack.pop() # returns 3` },
+      { type:"lesson", tag:"ADT", title:"Queue — FIFO",
+        body:`Queue = <strong>First In, First Out</strong>. Like a line at a store.\n\n<strong>enqueue()</strong> — add to back: O(1)\n<strong>dequeue()</strong> — remove from front: O(1)\n<strong>front/peek()</strong> — view front: O(1)\n\n📌 Use cases: printer jobs, BFS, server request handling\n\n<strong>Deque</strong> — double-ended queue. Insert/delete from BOTH ends in O(1).`,
+        code:`from collections import deque\nq = deque()\nq.append("A")      # enqueue back\nq.append("B")\nfirst = q.popleft() # dequeue front → "A"` },
+      { type:"mcq", prompt:"Browser back button = which data structure?",
+        choices:["Queue","Stack","Linked List","Deque"], correct:1,
+        feedback_correct:"✅ Stack! LIFO — last page visited is the first you go back to.",
+        feedback_wrong:"❌ Stack (LIFO). Last page in = first page back." },
+      { type:"mcq", prompt:"A printer handles jobs in the order received. Which structure?",
+        choices:["Stack","Heap","Queue","Array"], correct:2,
+        feedback_correct:"✅ Queue! FIFO — first sent = first printed.",
+        feedback_wrong:"❌ Queue (FIFO). Printer jobs processed in order they arrive." },
+      { type:"mcq", prompt:"A Deque (double-ended queue) allows insertion at ___",
+        choices:["Front only","Back only","Both front and back","Middle only"], correct:2,
+        feedback_correct:"✅ Both ends! That's what makes a deque flexible — O(1) at front AND back.",
+        feedback_wrong:"❌ Both front and back. Deque = Double-Ended Queue. Insert/delete at either end." },
+      { type:"lesson", tag:"METHOD NAMES", title:"Remove() and Enumerate()",
+        body:`WGU tests exact method names beyond push/pop:\n\n<strong>remove(item)</strong> — deletes the FIRST occurrence of a specific VALUE. Different from pop() which removes by position.\n\n<strong>enumerate()</strong> — returns each element paired with its index. Use when you need BOTH the value AND its position during a loop.\n\n<strong>Push vs Append</strong> — Push = stack top. Append = list end. Often interchangeable in Python.`,
+        code:`lst = ["a","b","c","b"]\nlst.remove("b")   # removes FIRST "b" → ["a","c","b"]\n\nfor i, val in enumerate(["x","y","z"]):\n    print(i, val) # 0 x / 1 y / 2 z` },
+      { type:"mcq", prompt:"Which method removes the FIRST occurrence of a specific VALUE from a list?",
+        choices:["pop()","remove()","delete()","dequeue()"], correct:1,
+        feedback_correct:"✅ remove()! pop() removes by index/position. remove() removes by value.",
+        feedback_wrong:"❌ remove() deletes by value. pop() deletes by index (top of stack)." },
+      { type:"mcq", prompt:"enumerate() is used when you need ___",
+        choices:["Only the values","Only the indices","Both the index AND the value","To remove items"], correct:2,
+        feedback_correct:"✅ Both! enumerate() pairs each element with its index — (0,'x'), (1,'y')...",
+        feedback_wrong:"❌ enumerate() gives you (index, value) pairs. Use when you need position during iteration." },
+      { type:"fill", prompt:"Stack = LIFO. Queue = ___ (acronym, spelled out)",
+        answer:"fifo", accepts:["fifo","FIFO","first in first out","First In First Out"],
+        feedback_correct:"✅ FIFO — First In, First Out. First element added is first removed.",
+        feedback_wrong:"❌ FIFO — First In First Out. Queue processes in arrival order." }
+    ]
+  },
+  {
+    id: 7, emoji: "🌳", title: "Trees & Traversals",
+    desc: "BST, AVL, Red-Black, B-Trees — plus Pre/In/Post-order traversal",
+    xp: 25,
+    steps: [
+      { type:"lesson", tag:"DATA STRUCTURE", title:"Binary Search Tree Rules",
+        body:`BST ordering rule:\n• <strong>Left child</strong> < parent\n• <strong>Right child</strong> > parent\n\nBalanced BST: O(log n) search/insert/delete\nUnbalanced BST: degrades to O(n)\n\n<strong>Smallest value</strong> = leftmost node\n<strong>Largest value</strong> = rightmost node`,
+        diagram:{type:"tree"} },
+      { type:"lesson", tag:"TREE TRAVERSALS", title:"Pre / In / Post Order",
+        body:`Given tree with root A, left B (children D,E), right C:\n\n<strong>Pre-Order (NLR)</strong> — Node→Left→Right\nResult: A B D E C\n\n<strong>In-Order (LNR)</strong> — Left→Node→Right\nResult: D B E A C  ← gives SORTED output in BST!\n\n<strong>Post-Order (LRN)</strong> — Left→Right→Node\nResult: D E B C A\n\nMemory trick: Pre=Node FIRST. In=Node BETWEEN. Post=Node LAST.` },
+      { type:"lesson", tag:"ADVANCED TREES", title:"AVL, Red-Black, B-Trees",
+        body:`<strong>AVL Tree</strong> — self-balancing BST. Height difference between subtrees ≤ 1. Uses rotations. O(log n) always.\n\n<strong>Red-Black Tree</strong> — self-balancing. Nodes colored red/black. Fewer rotations than AVL. Used in Java TreeMap, Linux kernel. O(log n).\n\n<strong>B-Tree</strong> — nodes can have MORE than 2 children. Used in databases and file systems. Minimizes disk I/O. O(log n).` },
+      { type:"mcq", prompt:"In-Order traversal of a BST gives elements in ___",
+        choices:["Random order","Reverse order","Sorted ascending order","Pre-order"], correct:2,
+        feedback_correct:"✅ Sorted ascending! In-Order (Left→Node→Right) on a BST always produces sorted output.",
+        feedback_wrong:"❌ In-Order traversal on a BST produces sorted ascending order. That's its special property." },
+      { type:"mcq", prompt:"Pre-Order traversal visits nodes in which order?",
+        choices:["Left→Right→Node","Left→Node→Right","Node→Left→Right","Right→Node→Left"], correct:2,
+        feedback_correct:"✅ Node→Left→Right (NLR). 'Pre' = node comes BEFORE (pre) its children.",
+        feedback_wrong:"❌ Pre-Order = NLR = Node first, then Left, then Right. Pre means 'before'." },
+      { type:"mcq", prompt:"Inserting 1,2,3,4,5 in order into a BST creates ___",
+        choices:["Balanced tree","A sorted linked-list shape","A complete binary tree","A min-heap"], correct:1,
+        feedback_correct:"✅ Degenerate tree! Sorted insertion = every node hangs right. Search becomes O(n).",
+        feedback_wrong:"❌ Sorted insertion creates a straight line — worst case BST. O(n) search." },
+      { type:"match", prompt:"Match each tree type to its key feature:",
+        pairs:[
+          {left:"AVL Tree", right:"Height diff ≤ 1"},
+          {left:"Red-Black Tree", right:"Node colors"},
+          {left:"B-Tree", right:"Multi-child nodes"},
+        ],
+        feedback_correct:"✅ AVL=height balance, Red-Black=colors, B-Tree=multi-child. Classic WGU distinctions.",
+        feedback_wrong:"❌ AVL controls height. Red-Black uses colors. B-Tree allows many children per node." }
+    ]
+  },
+  {
+    id: 8, emoji: "#️⃣", title: "Hash Tables",
+    desc: "O(1) average lookup — hash functions, collisions, chaining",
+    xp: 20,
+    steps: [
+      { type:"lesson", tag:"DATA STRUCTURE", title:"How Hash Tables Work",
+        body:`A hash function converts a <strong>key → array index</strong>.\n\nCommon formula: <strong>key % tableSize</strong>\nExample: key=2023, tableSize=1009\n2023 / 1009 = 2.00495...\n0.00495 × 1009 = <strong>5</strong> → stored at index 5\n\n✅ Insert: O(1) average\n✅ Search: O(1) average\n✅ Delete: O(1) average\n❌ Worst case (all collide): O(n)`,
+        code:`# Python dict IS a hash table\nphone = {}\nphone["Alice"] = "555-1234"  # O(1)\nnum = phone["Alice"]          # O(1)` },
+      { type:"lesson", tag:"COLLISIONS", title:"Handling Collisions",
+        body:`A <strong>collision</strong> = two keys hash to the same index.\n\n<strong>Chaining</strong> — each bucket holds a linked list of items that share that index. WGU tests this most.\n\n<strong>Open Addressing</strong> — find next empty bucket using:\n• Linear probing\n• Quadratic probing\n• Double hashing\n\nGood hash function properties: Deterministic, Uniform distribution, Fast to compute.` },
+      { type:"mcq", prompt:"Two keys hash to the same bucket index. This is called ___",
+        choices:["Overflow","Collision","Index Error","Bucket Fault"], correct:1,
+        feedback_correct:"✅ Collision! Hash tables handle this with chaining or open addressing.",
+        feedback_wrong:"❌ Collision — when two keys map to the same index in the hash table." },
+      { type:"fill", prompt:"Hash table worst case (all items in one bucket) degrades to O(___)",
+        answer:"n", accepts:["n","O(n)"],
+        feedback_correct:"✅ O(n)! Everything in one bucket = scanning a linked list = linear time.",
+        feedback_wrong:"❌ O(n). Worst case = all keys collide into one bucket = linear scan." },
+      { type:"mcq", prompt:"Which collision strategy stores multiple items at the same index using a list?",
+        choices:["Linear Probing","Double Hashing","Chaining","Quadratic Probing"], correct:2,
+        feedback_correct:"✅ Chaining! Each bucket holds a list. WGU's most-tested collision strategy.",
+        feedback_wrong:"❌ Chaining — each bucket has a linked list of items that share that hash index." }
+    ]
+  },
+  {
+    id: 9, emoji: "🏔️", title: "Heaps & Priority Queues",
+    desc: "Min-heap, max-heap, heapify — plus the child index formulas",
+    xp: 25,
+    steps: [
+      { type:"lesson", tag:"DATA STRUCTURE", title:"Heap Properties",
+        body:`A heap is a <strong>complete binary tree</strong> with the heap property:\n\n<strong>Max-Heap</strong> — parent ≥ children. Root = largest.\n<strong>Min-Heap</strong> — parent ≤ children. Root = smallest.\n\nOperations:\n• Insert: O(log n) — add at end, heapify up\n• Delete max/min: O(log n) — swap root with last, heapify down\n• Peek max/min: O(1) — just read root\n• Heapify array: O(n)` },
+      { type:"lesson", tag:"INDEX FORMULAS", title:"Child Node Index Formulas",
+        body:`For a heap stored as an array, if a node is at index <strong>i</strong>:\n\n<strong>Left child</strong> = 2i + 1\n<strong>Right child</strong> = 2i + 2\n<strong>Parent</strong> = (i - 1) // 2\n\nExample: heapList = [22, 33, 44, 55, 66]\n• Node 22 is at index 0\n• Left child of 22 = 2(0)+1 = index 1 → value 33\n• Right child of 22 = 2(0)+2 = index 2 → value 44`,
+        code:`heapList = [22, 33, 44, 55, 66]\n# Node at index i=0 (value=22)\nleft  = 2*0 + 1  # = 1 → 33\nright = 2*0 + 2  # = 2 → 44` },
+      { type:"mcq", prompt:"In a MAX-heap, the root always contains ___",
+        choices:["The smallest value","A random value","The largest value","The median"], correct:2,
+        feedback_correct:"✅ Largest value! Max-heap property: every parent ≥ its children.",
+        feedback_wrong:"❌ The largest value. Max-heap: parent ≥ children, so root is always the maximum." },
+      { type:"fill", prompt:"A node at index i in a heap. Its LEFT child is at index ___",
+        answer:"2i+1", accepts:["2i+1","2i + 1","2*i+1","2*i + 1"],
+        feedback_correct:"✅ 2i+1! This is a must-know formula for the WGU C949 exam.",
+        feedback_wrong:"❌ Left child = 2i+1. Right child = 2i+2. Memorize these!" },
+      { type:"mcq", prompt:"Heap Sort uses which structure to repeatedly extract the maximum element?",
+        choices:["Binary Search Tree","Min-Heap","Max-Heap","Stack"], correct:2,
+        feedback_correct:"✅ Max-Heap! Build max-heap, extract root (max), rebuild, repeat. Always O(n log n).",
+        feedback_wrong:"❌ Max-Heap. Heap Sort builds a max-heap, extracts max repeatedly." }
+    ]
+  },
+  {
+    id: 10, emoji: "🕸️", title: "Graphs",
+    desc: "Directed, undirected, weighted — DFS, BFS, Dijkstra, Bellman-Ford",
+    xp: 25,
+    steps: [
+      { type:"lesson", tag:"DATA STRUCTURE", title:"Graph Types",
+        body:`A graph = nodes (<strong>vertices</strong>) + connections (<strong>edges</strong>).\n\n<strong>Directed</strong> — edges have direction (A→B)\n<strong>Undirected</strong> — edges go both ways (A—B)\n<strong>Weighted</strong> — edges have costs/distances\n<strong>Unweighted</strong> — edges have no weight\n\nOperations:\n• Add vertex: O(1)\n• Add edge: O(1)\n• DFS/BFS: O(V+E) where V=vertices, E=edges` },
+      { type:"lesson", tag:"GRAPH REPRESENTATION", title:"Adjacency List vs Adjacency Matrix",
+        body:`Two ways to store a graph:\n\n<strong>Adjacency Matrix</strong> — 2D array, matrix[i][j]=1 if edge exists.\n• Space: O(V²) — wasteful for sparse graphs\n• Edge lookup: O(1) — instant\n• Best for: DENSE graphs, frequent edge queries\n\n<strong>Adjacency List</strong> — each vertex stores list of neighbors.\n• Space: O(V+E) — efficient for sparse graphs\n• Edge lookup: O(degree)\n• Best for: SPARSE graphs, DFS/BFS traversal`,
+        code:`# Adjacency Matrix\nmatrix = [[0,1,1,0],[1,0,0,1],[1,0,0,1],[0,1,1,0]]\n# matrix[0][1]=1 means edge from vertex 0 to 1\n\n# Adjacency List\nadj = {0:[1,2], 1:[0,3], 2:[0,3], 3:[1,2]}` },
+      { type:"mcq", prompt:"Which graph representation always uses O(V²) space regardless of edge count?",
+        choices:["Adjacency List","Adjacency Matrix","Edge List","Hash Map"], correct:1,
+        feedback_correct:"✅ Adjacency Matrix! Always V×V cells even if most are empty zeros.",
+        feedback_wrong:"❌ Adjacency Matrix uses O(V²) always. Adjacency List only uses O(V+E)." },
+      { type:"mcq", prompt:"Checking if a specific edge (u,v) exists is O(1) in which representation?",
+        choices:["Adjacency List","Adjacency Matrix","Both","Neither"], correct:1,
+        feedback_correct:"✅ Adjacency Matrix! matrix[u][v] is direct index access — O(1).",
+        feedback_wrong:"❌ Adjacency Matrix. matrix[u][v] = instant. List requires scanning neighbors." },
+      { type:"mcq", prompt:"You have a SPARSE graph with few edges. Which is more space-efficient?",
+        choices:["Adjacency Matrix","Adjacency List","Both equal","Depends on edge weight"], correct:1,
+        feedback_correct:"✅ Adjacency List! O(V+E) — only stores actual edges. Matrix wastes space on all the zeros.",
+        feedback_wrong:"❌ Adjacency List wins for sparse graphs. Matrix's O(V²) is mostly empty cells." },
+      { type:"lesson", tag:"SHORTEST PATH", title:"Dijkstra vs Bellman-Ford",
+        body:`<strong>Dijkstra's Algorithm</strong>\n• Type: Greedy\n• Works on: Non-negative weights only\n• Time: O(V²) basic / O(V log V + E) with priority queue\n• Cannot detect negative cycles\n\n<strong>Bellman-Ford Algorithm</strong>\n• Type: Dynamic Programming\n• Works on: Negative weights too\n• Time: O(V × E)\n• CAN detect negative weight cycles\n• More general but slower` },
+      { type:"mcq", prompt:"Your graph has negative edge weights. Which shortest-path algorithm must you use?",
+        choices:["Dijkstra","Binary Search","Bellman-Ford","DFS"], correct:2,
+        feedback_correct:"✅ Bellman-Ford! It handles negative weights. Dijkstra breaks with negative edges.",
+        feedback_wrong:"❌ Bellman-Ford. Dijkstra only works with non-negative edge weights." },
+      { type:"mcq", prompt:"Dijkstra's algorithm is classified as which algorithm type?",
+        choices:["Dynamic Programming","Divide & Conquer","Recursive","Greedy"], correct:3,
+        feedback_correct:"✅ Greedy! Dijkstra always picks the vertex with the smallest known distance.",
+        feedback_wrong:"❌ Greedy — Dijkstra makes the locally optimal choice at each step." },
+      { type:"match", prompt:"Match the algorithm to its type:",
+        pairs:[
+          {left:"Dijkstra", right:"Greedy"},
+          {left:"Bellman-Ford", right:"Dynamic Programming"},
+          {left:"DFS/BFS", right:"O(V+E)"},
+        ],
+        feedback_correct:"✅ Dijkstra=Greedy, Bellman-Ford=Dynamic Programming, DFS/BFS=O(V+E). WGU favorites.",
+        feedback_wrong:"❌ Dijkstra is Greedy. Bellman-Ford is Dynamic Programming. Both DFS and BFS run in O(V+E)." }
+    ]
+  },
+  {
+    id: 11, emoji: "⚙️", title: "Applies Algorithms — Variables & Types",
+    desc: "Static vs dynamic, strongly vs weakly typed — 40% of the exam",
+    xp: 20,
+    steps: [
+      { type:"lesson", tag:"APPLIES ALGORITHMS — 40%", title:"Static vs Dynamic Variables",
+        body:`<strong>Static Variables</strong>\n• Type and size known at COMPILE time\n• Memory allocated on the stack\n• Fixed size — can't grow\n• Example: int x = 10; in Java/C++\n\n<strong>Dynamic Variables</strong>\n• Type/size determined at RUNTIME\n• Memory allocated on the HEAP\n• Can grow and change\n• Example: Python list — x = []; x.append(20)`,
+        code:`# Static (Java)\nint x = 10;  # fixed type, fixed size\n\n# Dynamic (Python)\nx = []       # grows at runtime\nx.append(20)\nx.append(30)` },
+      { type:"lesson", tag:"TYPE SYSTEMS", title:"Strongly vs Weakly Typed",
+        body:`<strong>Strongly Typed</strong> — type rules strictly enforced. No implicit conversion between incompatible types.\n• Java, Python, C#\n• x = 10; y = "5"; x + y → ERROR\n\n<strong>Weakly Typed</strong> — implicit type coercion allowed.\n• JavaScript, PHP\n• x = 10; y = "5"; x + y → "105" (JS coerces to string)\n\n⚠️ Python is strongly typed even though dynamically typed!` },
+      { type:"mcq", prompt:"In JavaScript: let x = 10; let y = '5'; x + y produces ___",
+        choices:["15","Error","'105'","'10+5'"], correct:2,
+        feedback_correct:"✅ '105'! JS is weakly typed — it coerces the number to a string and concatenates.",
+        feedback_wrong:"❌ '105' — JavaScript implicitly converts 10 to a string and concatenates. Weakly typed." },
+      { type:"mcq", prompt:"Python is ___-typed and ___-typed",
+        choices:["Static, Strong","Dynamic, Weak","Dynamic, Strong","Static, Weak"], correct:2,
+        feedback_correct:"✅ Dynamic + Strong! Python determines types at runtime but enforces them strictly.",
+        feedback_wrong:"❌ Python is Dynamically typed (runtime) and Strongly typed (no implicit coercion)." },
+      { type:"mcq", prompt:"Dynamic variables allocate memory on the ___",
+        choices:["Stack","Register","Heap","Data segment"], correct:2,
+        feedback_correct:"✅ Heap! Dynamic memory (malloc, new, Python objects) lives on the heap.",
+        feedback_wrong:"❌ Heap. Static variables use the stack. Dynamic allocation uses the heap." }
+    ]
+  },
+  {
+    id: 12, emoji: "🔣", title: "Operators & Precedence",
+    desc: "Assignment operators, order of operations — Python and beyond",
+    xp: 15,
+    steps: [
+      { type:"lesson", tag:"APPLIES ALGORITHMS", title:"Assignment Operators",
+        body:`<strong>Simple:</strong> = assigns a value\n\n<strong>Compound (combine op + assign):</strong>\n+= addition\n-= subtraction\n*= multiplication\n/= division\n//= floor division\n%= modulus\n**= exponentiation\n&=, |=, ^=, <<=, >>= bitwise`,
+        code:`x = 10\nx += 5   # x is now 15\nx *= 2   # x is now 30\nx %= 7   # x is now 2 (30 % 7 = 2)` },
+      { type:"lesson", tag:"PRECEDENCE", title:"Order of Operations",
+        body:`Highest to lowest precedence:\n\n<strong>1.</strong> () Parentheses\n<strong>2.</strong> ** Exponentiation\n<strong>3.</strong> Unary +/- (negative numbers)\n<strong>4.</strong> * / // % (left to right)\n<strong>5.</strong> + - (left to right)\n<strong>6.</strong> Comparisons: == != > < >= <=\n<strong>7.</strong> not\n<strong>8.</strong> and\n<strong>9.</strong> or\n<strong>10.</strong> = += -= (assignment, last)` },
+      { type:"mcq", prompt:"What does x **= 3 do when x = 2?",
+        choices:["x = 2*3 = 6","x = 2**3 = 8","x = 2+3 = 5","x = 23"], correct:1,
+        feedback_correct:"✅ x = 8! **= means raise to the power. 2³ = 8.",
+        feedback_wrong:"❌ **= is exponentiation assignment. 2**3 = 8. So x becomes 8." },
+      { type:"fill", prompt:"(2 + 3) * 4 evaluates to ___ (parentheses first rule)",
+        answer:"20", accepts:["20"],
+        feedback_correct:"✅ 20! Parentheses first: (2+3)=5, then 5*4=20.",
+        feedback_wrong:"❌ 20. Parentheses have highest precedence: (2+3)=5, then 5×4=20." },
+      { type:"mcq", prompt:"6 / 2 * 3 evaluates to ___ (left to right, same precedence)",
+        choices:["1","9","4","36"], correct:1,
+        feedback_correct:"✅ 9! Same precedence = left to right. 6/2=3, then 3*3=9.",
+        feedback_wrong:"❌ 9. Division and multiplication have equal precedence — go left to right. 6/2=3, then 3*3=9." }
+    ]
+  },
+  {
+    id: 13, emoji: "🔄", title: "Loops & Conditionals",
+    desc: "For, while, do-while, break, continue — if/elif/else/switch",
+    xp: 20,
+    steps: [
+      { type:"lesson", tag:"APPLIES ALGORITHMS", title:"Loop Types",
+        body:`<strong>for loop</strong> — iterates over a sequence or range\n<strong>while loop</strong> — runs while condition is True\n<strong>do-while</strong> — runs AT LEAST ONCE (C/C++, not Python)\n\n<strong>break</strong> — exits loop immediately\n<strong>continue</strong> — skips rest of current iteration\n<strong>pass</strong> — Python placeholder, does nothing`,
+        code:`# for loop\nfor i in range(5): print(i)\n\n# while loop\ncount = 0\nwhile count < 5:\n    count += 1\n\n# break\nfor i in range(10):\n    if i == 5: break   # stops at 5\n\n# continue\nfor i in range(10):\n    if i % 2 == 0: continue  # skips even` },
+      { type:"lesson", tag:"CONDITIONALS", title:"If / Elif / Else / Switch",
+        body:`<strong>if</strong> — runs if condition is True\n<strong>elif</strong> — checks next condition if previous was False\n<strong>else</strong> — runs if all above are False\n<strong>switch-case</strong> — C/C++/Java dispatch by value (not in Python)\n\n<strong>Logical operators:</strong>\n<strong>and</strong> — both must be True\n<strong>or</strong> — at least one must be True\n<strong>not</strong> — inverts the boolean`,
+        code:`x = 7\nif x > 10:\n    print("big")\nelif x == 7:\n    print("lucky")\nelse:\n    print("other")\n# Output: lucky` },
+      { type:"mcq", prompt:"Which loop is guaranteed to execute its body AT LEAST ONCE?",
+        choices:["for loop","while loop","do-while loop","nested loop"], correct:2,
+        feedback_correct:"✅ do-while! It executes first, then checks the condition. (C/C++, not Python).",
+        feedback_wrong:"❌ do-while — runs the body first, then checks the condition. Always runs at least once." },
+      { type:"mcq", prompt:"'continue' inside a loop ___",
+        choices:["Exits the loop","Pauses the loop","Skips the rest of the current iteration","Restarts the loop"],
+        correct:2,
+        feedback_correct:"✅ Skips current iteration! continue goes back to the loop condition without finishing the body.",
+        feedback_wrong:"❌ continue skips the remaining code in the current iteration and moves to the next one." },
+      { type:"mcq", prompt:"if x > 0 AND x < 10 — what operator connects these conditions?",
+        choices:["or","not","and","=="], correct:2,
+        feedback_correct:"✅ and! Both conditions must be True for the block to execute.",
+        feedback_wrong:"❌ 'and' — requires BOTH conditions to be True simultaneously." },
+      { type:"fill", prompt:"Python keyword that acts as a placeholder in a block with no code is ___",
+        answer:"pass", accepts:["pass"],
+        feedback_correct:"✅ pass! It's syntactically required when a block is empty but you don't want to do anything.",
+        feedback_wrong:"❌ pass. Python requires a statement in every block — pass satisfies that without doing anything." }
+    ]
+  },
+  {
+    id: 14, emoji: "🏗️", title: "Classes & OOP",
+    desc: "Classes, inheritance, encapsulation, polymorphism — the four pillars",
+    xp: 25,
+    steps: [
+      { type:"lesson", tag:"APPLIES ALGORITHMS", title:"Class Anatomy",
+        body:`A <strong>class</strong> is a blueprint for creating objects.\n\n<strong>Attributes</strong> — variables that hold object data (state)\n<strong>Methods</strong> — functions that operate on that data\n<strong>Constructor</strong> — __init__ in Python. Called when object is created.\n<strong>Destructor</strong> — __del__ in Python. Called when object is destroyed (rare).`,
+        code:`class Car:\n    def __init__(self, make, year):  # constructor\n        self.make = make  # attribute\n        self.year = year\n\n    def display(self):  # method\n        print(f"{self.year} {self.make}")\n\nmy_car = Car("Toyota", 2022)\nmy_car.display()  # 2022 Toyota` },
+      { type:"lesson", tag:"OOP PILLARS", title:"Inheritance, Encapsulation, Polymorphism",
+        body:`<strong>Inheritance</strong> — child class inherits attributes/methods from parent class. Reuse code.\n\n<strong>Encapsulation</strong> — hide internal data. Use __private or getter/setter methods. Controls access.\n\n<strong>Polymorphism</strong> — different classes respond to the same method call differently (method overriding).\n\nExample: Animal.speak() → Dog says "Bark", Cat says "Meow".`,
+        code:`class Animal:\n    def speak(self): print("...")\n\nclass Dog(Animal):      # Inheritance\n    def speak(self):    # Polymorphism\n        print("Bark!")\n\ndog = Dog()\ndog.speak()  # "Bark!"` },
+      { type:"mcq", prompt:"Which OOP concept allows a child class to reuse code from a parent class?",
+        choices:["Encapsulation","Polymorphism","Inheritance","Abstraction"], correct:2,
+        feedback_correct:"✅ Inheritance! Child class extends parent, getting all its attributes and methods.",
+        feedback_wrong:"❌ Inheritance — child class inherits (gets) attributes and methods from the parent." },
+      { type:"mcq", prompt:"__init__ in Python is the ___",
+        choices:["Destructor","Static method","Constructor","Private method"], correct:2,
+        feedback_correct:"✅ Constructor! Called automatically when you create a new object instance.",
+        feedback_wrong:"❌ Constructor (__init__). Called when you do MyClass() to create an instance." },
+      { type:"mcq", prompt:"Hiding internal data with private attributes and using getters/setters is ___",
+        choices:["Inheritance","Polymorphism","Recursion","Encapsulation"], correct:3,
+        feedback_correct:"✅ Encapsulation! Controls what external code can access inside an object.",
+        feedback_wrong:"❌ Encapsulation — restricting direct access to object internals. Use __private and getter methods." },
+      { type:"mcq", prompt:"Multiple classes each have a speak() method but produce different output. This is ___",
+        choices:["Inheritance","Encapsulation","Polymorphism","Overloading"], correct:2,
+        feedback_correct:"✅ Polymorphism! Same method name, different behavior depending on the class.",
+        feedback_wrong:"❌ Polymorphism — 'many forms'. Same method call behaves differently for different classes." }
+    ]
+  },
+  {
+    id: 15, emoji: "🧠", title: "Memory & Programming Concepts",
+    desc: "Garbage collection, memory allocation, enumerations, data flow diagrams",
+    xp: 20,
+    steps: [
+      { type:"lesson", tag:"PROGRAMMING CONCEPTS", title:"Memory Management",
+        body:`<strong>Garbage Collection</strong> — automatically frees memory no longer used.\n• Java: JVM handles it\n• Python: reference counting + GC\n\n<strong>Reference Count</strong> — tracks how many variables point to an object. When count hits 0, memory is freed.\n\n<strong>Stack Memory</strong> — static variables, function calls. Fast. Fixed size.\n<strong>Heap Memory</strong> — dynamic allocation (new, malloc). Flexible. Manually managed in C/C++.` },
+      { type:"lesson", tag:"MEMORY ALLOCATION", title:"Sequential vs Linked Allocation",
+        body:`<strong>Sequential Allocation</strong> — memory allocated in a continuous block.\n• Used by: Arrays\n• Fast access by index\n• Must declare size upfront\n\n<strong>Linked Allocation</strong> — memory in scattered nodes, each pointing to the next.\n• Used by: Linked Lists\n• No size limit upfront\n• Slower traversal` },
+      { type:"lesson", tag:"DATA TYPES", title:"Enumerations (Enums)",
+        body:`An <strong>enum</strong> is a set of named constants. Limits a variable to specific values only.\n\n✅ Improves readability\n✅ Prevents invalid values\n✅ Easier to maintain`,
+        code:`# Python enum\nfrom enum import Enum\nclass Direction(Enum):\n    NORTH = 1\n    EAST  = 2\n    SOUTH = 3\n    WEST  = 4\n\ndir = Direction.NORTH` },
+      { type:"mcq", prompt:"When a Python object's reference count reaches 0, the object is ___",
+        choices:["Moved to heap","Archived","Garbage collected (freed)","Converted to None"], correct:2,
+        feedback_correct:"✅ Freed by garbage collection! No references = no way to access it = safe to delete.",
+        feedback_wrong:"❌ Garbage collected. Reference count = 0 means nothing points to it — memory freed." },
+      { type:"mcq", prompt:"Arrays use ___ memory allocation. Linked Lists use ___ allocation.",
+        choices:["Linked, Sequential","Sequential, Linked","Heap, Stack","Stack, Heap"], correct:1,
+        feedback_correct:"✅ Sequential (contiguous) for arrays, Linked (scattered nodes) for linked lists.",
+        feedback_wrong:"❌ Arrays=Sequential (contiguous block). Linked Lists=Linked (scattered nodes with pointers)." },
+      { type:"mcq", prompt:"An enum is best used when a variable should only hold ___",
+        choices:["Any integer","A string","One of a small set of named values","Dynamic values"], correct:2,
+        feedback_correct:"✅ Named constants! Enums prevent invalid values and make code readable.",
+        feedback_wrong:"❌ Enums hold one of a predefined set of named constants. Prevents invalid assignments." }
+    ]
+  },
+  {
+    id: 16, emoji: "🎒", title: "Bags & Dictionaries",
+    desc: "Unordered collections, multisets, and key-value maps — WGU ADT completeness",
+    xp: 20,
+    steps: [
+      { type:"lesson", tag:"ADT", title:"What is a Bag?",
+        body:`A <strong>Bag</strong> (Multiset) is an unordered collection that <strong>ALLOWS DUPLICATES</strong>.\n\n• No position or index — unordered\n• Duplicates allowed: {3, 3, 5, 7, 7}\n• Operations: add, count, contains, size\n• Typically NO remove operation\n\n<strong>Bag vs Set:</strong> Set rejects duplicates. Bag keeps them.\n<strong>Bag vs List:</strong> List has order + indexing. Bag has neither.\n\n📌 Use cases: word frequency counting, inventory tracking, statistical sampling.` },
+      { type:"lesson", tag:"DICTIONARY / MAP", title:"Dictionary — Key-Value Pairs",
+        body:`A <strong>Dictionary</strong> (Map, HashMap, Associative Array) stores <strong>key → value</strong> pairs.\n\n• Keys must be unique and hashable (immutable)\n• Values can be anything\n• Backed by a hash table → O(1) average for all ops\n\nAll operations: get, set, delete, contains — <strong>O(1) average</strong>.`,
+        code:`ages = {"Alice": 30, "Bob": 25}\nages["Carol"] = 28        # set — O(1)\nx = ages["Alice"]         # get → 30\ndel ages["Bob"]           # delete\n"Alice" in ages           # contains → True\n\n# get with default (won't throw KeyError)\nval = ages.get("Dave", 0) # → 0` },
+      { type:"lesson", tag:"DICTIONARY METHODS", title:"All Dict Methods WGU Tests",
+        body:`<strong>ages.get(key, default)</strong> — safe lookup, returns default if key missing\n<strong>ages.pop(key)</strong> — removes key and returns its value\n<strong>ages.popitem()</strong> — removes and returns last inserted pair\n<strong>ages.setdefault(key, val)</strong> — inserts key with val if not present\n<strong>ages.update(other)</strong> — merges another dict in\n<strong>ages.keys()</strong> — all keys\n<strong>ages.values()</strong> — all values\n<strong>ages.items()</strong> — all (key, value) pairs\n<strong>ages.clear()</strong> — empties the dict\n<strong>len(ages)</strong> — number of pairs` },
+      { type:"mcq", prompt:"Which ADT is an UNORDERED collection that allows duplicate elements?",
+        choices:["Set","List","Bag","Stack"], correct:2,
+        feedback_correct:"✅ Bag (Multiset)! No order, duplicates allowed. Sets reject duplicates.",
+        feedback_wrong:"❌ Bag. Sets reject duplicates. Lists have order. Bags are unordered with duplicates." },
+      { type:"mcq", prompt:"The main difference between a Bag and a Set is ___",
+        choices:["Bags are sorted","Bags allow duplicates","Sets are faster","Bags use less memory"], correct:1,
+        feedback_correct:"✅ Bags allow duplicates! Sets enforce uniqueness. Both are unordered.",
+        feedback_wrong:"❌ Bags allow duplicates, Sets do not. That's the defining difference between them." },
+      { type:"mcq", prompt:"A Python dict is backed by which underlying data structure?",
+        choices:["Linked List","Binary Tree","Hash Table","Array"], correct:2,
+        feedback_correct:"✅ Hash Table! That's why all dict operations average O(1).",
+        feedback_wrong:"❌ Hash Table. Python dicts use hashing to achieve O(1) average operations." },
+      { type:"mcq", prompt:"ages.get('Dave', 0) when 'Dave' is not in the dict returns ___",
+        choices:["KeyError","None","0","False"], correct:2,
+        feedback_correct:"✅ 0! .get() returns the default value instead of raising a KeyError. Safe lookup.",
+        feedback_wrong:"❌ 0 — the second argument to .get() is the default returned when the key is missing." },
+      { type:"fill", prompt:"Dictionary keys must be ___ (immutable types like strings, ints, tuples)",
+        answer:"hashable", accepts:["hashable","immutable","hashable/immutable"],
+        feedback_correct:"✅ Hashable! Strings, numbers, tuples work as keys. Lists and dicts do not.",
+        feedback_wrong:"❌ Hashable (immutable). Mutable types like lists can't be used as dict keys." }
+    ]
+  }
+];
+
+// ── STATE ──
+let currentUser = null; // set on name screen
+let state = { completedModules:[], xp:0, streak:0, lastDate:'' };
+let currentModule=null,currentStep=0,hearts=3,answered=false,selectedChoice=null,matchPairs=[];
+let matchState={leftSel:null,rightSel:null,matched:[]};
+
+function userKey(k){ return `c949_${currentUser}_${k}`; }
+
+function loadUserState(){
+  state.completedModules = JSON.parse(localStorage.getItem(userKey('completed')) || '[]');
+  state.xp               = parseInt(localStorage.getItem(userKey('xp')) || '0');
+  state.streak           = parseInt(localStorage.getItem(userKey('streak')) || '0');
+  state.lastDate         = localStorage.getItem(userKey('lastDate')) || '';
+}
+
+function saveState(){
+  localStorage.setItem(userKey('completed'), JSON.stringify(state.completedModules));
+  localStorage.setItem(userKey('xp'),        state.xp);
+  localStorage.setItem(userKey('streak'),    state.streak);
+  localStorage.setItem(userKey('lastDate'),  state.lastDate);
+  pushToLeaderboard();
+}
+
+function checkStreak(){
+  const today=new Date().toDateString();
+  if(state.lastDate!==today){
+    const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+    if(state.lastDate===yesterday.toDateString()) state.streak+=1;
+    else if(state.lastDate!==today) state.streak=1;
+    state.lastDate=today; saveState();
+  }
+  document.getElementById('streak-count').textContent=state.streak;
+}
+
+// ── AIRTABLE SYNC ──
+const AT_PAT     = 'YOUR_AIRTABLE_PAT_HERE'; // replace with your Airtable Personal Access Token
+const AT_BASE    = 'appIZnxctAFWm0N62';
+const AT_TABLE   = 'tbl8YYTQL5c93YgfJ';
+const AT_URL     = `https://api.airtable.com/v0/${AT_BASE}/${AT_TABLE}`;
+const AT_HEADERS = { 'Authorization': `Bearer ${AT_PAT}`, 'Content-Type': 'application/json' };
+
+// Find existing Airtable record ID for this user (stored locally after first push)
+function getRecordId(){ return localStorage.getItem(`c949_${currentUser}_atRecordId`) || null; }
+function setRecordId(id){ localStorage.setItem(`c949_${currentUser}_atRecordId`, id); }
+
+async function pushToLeaderboard(){
+  try {
+    const fields = {
+      'Name':              currentUser,
+      'Email':             getEmail(currentUser),
+      'XP':                state.xp,
+      'Streak':            state.streak,
+      'Modules Completed': state.completedModules.length,
+      'Last Active':       new Date().toLocaleDateString('en-US'),
+      'User Key':          `${currentUser}-${getEmail(currentUser)}`
+    };
+
+    const recordId = getRecordId();
+
+    if(recordId){
+      // PATCH existing record
+      await fetch(`${AT_URL}/${recordId}`, {
+        method: 'PATCH',
+        headers: AT_HEADERS,
+        body: JSON.stringify({ fields })
+      });
+    } else {
+      // Check if a record for this email already exists
+      const email = getEmail(currentUser);
+      const searchResp = await fetch(
+        `${AT_URL}?filterByFormula=${encodeURIComponent(`{Email}="${email}"`)}`,
+        { headers: AT_HEADERS }
+      );
+      const searchData = await searchResp.json();
+
+      if(searchData.records && searchData.records.length > 0){
+        // Record exists from a previous device — store ID and patch
+        const existingId = searchData.records[0].id;
+        setRecordId(existingId);
+        await fetch(`${AT_URL}/${existingId}`, {
+          method: 'PATCH',
+          headers: AT_HEADERS,
+          body: JSON.stringify({ fields })
+        });
+      } else {
+        // Brand new user — create record
+        const createResp = await fetch(AT_URL, {
+          method: 'POST',
+          headers: AT_HEADERS,
+          body: JSON.stringify({ fields })
+        });
+        const created = await createResp.json();
+        if(created.id) setRecordId(created.id);
+      }
+    }
+  } catch(e){ console.warn('Airtable sync failed (offline?):', e); }
+}
+
+async function loadLeaderboard(){
+  const el = document.getElementById('lb-content');
+  el.innerHTML='<div class="lb-loading">Loading scores...</div>';
+  try {
+    const resp = await fetch(
+      `${AT_URL}?sort[0][field]=XP&sort[0][direction]=desc&maxRecords=50`,
+      { headers: AT_HEADERS }
+    );
+    const data = await resp.json();
+
+    if(!data.records || data.records.length === 0){
+      el.innerHTML='<div class="lb-empty">No scores yet.<br>Complete a module to appear here!</div>';
+      return;
+    }
+
+    const maxXp = data.records[0]?.fields?.XP || 1;
+    const rankEmoji  = ['🥇','🥈','🥉'];
+    const rankClass  = ['gold','silver','bronze'];
+    const myEmail    = getEmail(currentUser);
+
+    el.innerHTML = data.records.map((rec, i) => {
+      const e     = rec.fields;
+      const isMe  = e.Email === myEmail || e.Name === currentUser;
+      const pct   = Math.round(((e.XP||0) / maxXp) * 100);
+      return `<div class="lb-row${isMe?' me':''}">
+        <div class="lb-rank ${rankClass[i]||''}">${rankEmoji[i]||('#'+(i+1))}</div>
+        <div class="lb-info">
+          <div class="lb-name">${e.Name||'Unknown'}${isMe?' <span style="font-size:.65rem;color:var(--accent);font-family:var(--mono);">YOU</span>':''}</div>
+          <div class="lb-meta">📚 ${e['Modules Completed']||0}/17 modules · 🔥 ${e.Streak||0} day streak · ${e['Last Active']||'—'}</div>
+          ${e.Email?`<div style="font-size:.68rem;font-family:var(--mono);color:var(--muted);margin-top:2px;">✉️ ${e.Email}</div>`:''}
+          <div class="lb-bar-wrap"><div class="lb-bar" style="width:${pct}%"></div></div>
+        </div>
+        <div class="lb-xp">⭐${e.XP||0}</div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    el.innerHTML='<div class="lb-empty">Leaderboard unavailable right now.<br>Your progress still saves locally.</div>';
+    console.warn('Leaderboard load failed:', e);
+  }
+}
+
+// ── NAME SCREEN LOGIC ──
+function getSavedUsers(){
+  const users = JSON.parse(localStorage.getItem('c949_users') || '[]');
+  return users;
+}
+
+function addSavedUser(name){
+  const users = getSavedUsers();
+  if(!users.includes(name)) users.unshift(name);
+  localStorage.setItem('c949_users', JSON.stringify(users.slice(0,8)));
+}
+
+function renderSavedUsers(){
+  const users = getSavedUsers();
+  const el = document.getElementById('saved-users-list');
+  if(!el || users.length===0) return;
+  el.innerHTML = `<div class="saved-label">— or continue as —</div>` +
+    users.map(u=>{
+      const xp  = localStorage.getItem(`c949_${u}_xp`) || '0';
+      const mods= JSON.parse(localStorage.getItem(`c949_${u}_completed`) || '[]').length;
+      const str = localStorage.getItem(`c949_${u}_streak`) || '0';
+      return `<div class="user-chip" onclick="loginAs('${u}')">
+        <div class="user-chip-info">
+          <div class="user-chip-name">${u}</div>
+          <div class="user-chip-stats">⭐ ${xp} XP · 📚 ${mods}/17 · 🔥 ${str} streak</div>
+          ${localStorage.getItem(`c949_${u}_email`) ? `<div style="font-size:.68rem;color:var(--muted);margin-top:1px;">✉️ ${localStorage.getItem('c949_'+u+'_email')}</div>` : ''}
+        </div>
+        <div class="user-chip-arrow">›</div>
+      </div>`;
+    }).join('');
+}
+
+function loginAs(name){
+  currentUser = name;
+  addSavedUser(name);
+  loadUserState();
+  document.getElementById('current-user-label').textContent = '👤 ' + name;
+  checkStreak();
+  buildMap();
+  pushToLeaderboard();
+  showScreen('map-screen');
+}
+
+function getEmail(name){
+  return localStorage.getItem(`c949_${name}_email`) || '';
+}
+
+function validateNameForm(){
+  const name  = document.getElementById('name-input').value.trim();
+  const email = document.getElementById('email-input').value.trim();
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  document.getElementById('name-start-btn').disabled = name.length < 2 || !emailValid;
+  const emailEl = document.getElementById('email-input');
+  if(email.length > 0)
+    emailEl.style.borderColor = emailValid ? 'var(--green)' : 'var(--red)';
+  else
+    emailEl.style.borderColor = 'var(--accent)';
+}
+
+function startAsUser(){
+  const name  = document.getElementById('name-input').value.trim();
+  const email = document.getElementById('email-input').value.trim();
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(name.length < 2 || !emailValid) return;
+  localStorage.setItem(`c949_${name}_email`, email);
+  loginAs(name);
+}
+
+// ── MAP ──
+let reviewMode=false;
+
+function buildMap(){
+  const map=document.getElementById('module-map');
+  map.innerHTML='';
+  const done=state.completedModules.length;
+  const total=MODULES.length;
+  document.getElementById('map-progress-label').textContent=`${done} / ${total} done`;
+  document.getElementById('map-progress-fill').style.width=`${(done/total)*100}%`;
+  document.getElementById('total-xp').textContent=`⭐ ${state.xp} XP`;
+  const reviewPill=document.getElementById('review-pill');
+  if(reviewPill) reviewPill.style.display=done>0?'block':'none';
+
+  MODULES.forEach((mod,i)=>{
+    const isDone=state.completedModules.includes(mod.id);
+    const isActive=i===done;
+    const isLocked=i>done;
+    const isClickable=isDone||isActive;
+
+    if(i>0){
+      const conn=document.createElement('div');
+      conn.className='module-connector'+(state.completedModules.includes(MODULES[i-1].id)?' done':'');
+      map.appendChild(conn);
+    }
+
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:14px;padding:4px 0;';
+
+    const nodeEl=document.createElement('div');
+    nodeEl.className='module-node'+(isDone?' done':isActive?' active':' locked');
+    nodeEl.innerHTML=isDone?'✅':mod.emoji;
+    if(isClickable) nodeEl.onclick=()=>startLesson(mod.id,isDone);
+
+    const labelWrap=document.createElement('div');
+    labelWrap.style.cssText='flex:1;';
+    const statusColor=isDone?'var(--green)':isActive?'var(--accent)':'var(--muted)';
+    const statusText=isDone?'✓ DONE — tap to review':isActive?'▶ START HERE':'🔒 LOCKED';
+
+    let reviewBtn='';
+    if(isDone){
+      reviewBtn=`<span style="display:inline-block;margin-left:6px;background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.3);border-radius:6px;padding:1px 7px;font-size:.65rem;color:var(--accent2);cursor:pointer;" onclick="event.stopPropagation();startLesson(${mod.id},true)">🔁 REVIEW</span>`;
+    }
+
+    labelWrap.innerHTML=`<div style="font-size:.9rem;font-weight:600;color:${isLocked?'var(--muted)':'var(--text)'}">${mod.title}${reviewBtn}</div><div style="font-size:.72rem;color:var(--muted);margin-top:2px;">${mod.desc}</div><div style="font-size:.68rem;font-family:var(--mono);color:${statusColor};margin-top:3px;">${statusText} · ${mod.xp} XP</div>`;
+
+    if(isClickable){
+      labelWrap.style.cursor='pointer';
+      labelWrap.onclick=()=>startLesson(mod.id,isDone);
+    }
+
+    row.appendChild(nodeEl);
+    row.appendChild(labelWrap);
+    map.appendChild(row);
+  });
+}
+
+// ── LESSON ──
+function startLesson(moduleId,isReview=false){
+  currentModule=MODULES.find(m=>m.id===moduleId);
+  reviewMode=isReview;
+  currentStep=0;hearts=3;answered=false;selectedChoice=null;
+  matchState={leftSel:null,rightSel:null,matched:[]};
+  showScreen('lesson-screen');
+  // Show/hide review banner
+  let banner=document.getElementById('review-banner');
+  if(!banner){
+    banner=document.createElement('div');
+    banner.id='review-banner';
+    banner.style.cssText='width:100%;max-width:480px;margin:8px 20px 0;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);border-radius:10px;padding:8px 14px;font-size:.78rem;color:var(--accent2);text-align:center;font-family:var(--mono);letter-spacing:.03em;';
+    const lessonScreen=document.getElementById('lesson-screen');
+    lessonScreen.insertBefore(banner,lessonScreen.children[1]);
+  }
+  if(isReview){
+    banner.style.display='block';
+    banner.textContent='🔁 REVIEW MODE — '+currentModule.title;
+  } else {
+    banner.style.display='none';
+  }
+  renderStep();
+}
+
+function renderStep(){
+  const step=currentModule.steps[currentStep];
+  document.getElementById('lesson-progress').style.width=`${(currentStep/currentModule.steps.length)*100}%`;
+  document.getElementById('hearts-display').textContent='❤️'.repeat(hearts)+'🖤'.repeat(3-hearts);
+  const container=document.getElementById('lesson-container');
+  container.innerHTML='';
+  answered=false;selectedChoice=null;
+  const btn=document.getElementById('check-btn');
+  btn.textContent='CHECK';btn.className='check-btn';btn.disabled=true;btn.onclick=handleCheck;
+  if(step.type==='lesson') renderLesson(step,container,btn);
+  else if(step.type==='mcq') renderMCQ(step,container,btn);
+  else if(step.type==='fill') renderFill(step,container,btn);
+  else if(step.type==='match'){matchState={leftSel:null,rightSel:null,matched:[]};renderMatch(step,container,btn);}
+}
+
+function buildDiagram(d){
+  if(d.type==='array') return `<div class="diagram">${d.values.map((v,i)=>`<div class="node" style="border-radius:6px;">${v}<div style="font-size:.5rem;color:var(--muted);position:absolute;bottom:2px;">[${i}]</div></div>`).join('')}</div>`;
+  if(d.type==='linked') return `<div class="diagram">${d.values.map((v,i)=>`<div class="node">${v}</div>${i<d.values.length-1?'<div class="arrow">→</div>':'<div class="arrow" style="color:#ef4444">∅</div>'}`).join('')}</div>`;
+  if(d.type==='tree') return `<div class="diagram" style="flex-direction:column;gap:8px;"><div style="display:flex;justify-content:center;"><div class="node highlight">8</div></div><div style="display:flex;justify-content:center;gap:32px;"><div class="node">3</div><div class="node">10</div></div><div style="display:flex;justify-content:center;gap:8px;"><div class="node">1</div><div class="node">6</div><div class="node" style="opacity:.3">∅</div><div class="node">14</div></div><div style="font-size:.7rem;color:var(--muted);font-family:var(--mono);text-align:center;">left &lt; parent &lt; right</div></div>`;
+  return '';
+}
+
+function colorizeCode(code){
+  return code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/(#[^\n]*)/g,'<span style="color:#4b5563">$1</span>')
+    .replace(/\b(def|return|if|elif|else|for|in|from|import|class|None|True|False|not|while|and|or|self|int|void|static|public|new|let|const|var)\b/g,'<span style="color:#c084fc">$1</span>')
+    .replace(/\b(\d+)\b/g,'<span style="color:#fbbf24">$1</span>')
+    .replace(/"([^"]*)"/g,'<span style="color:#6ee7b7">"$1"</span>');
+}
+
+function renderLesson(step,container,btn){
+  const card=document.createElement('div');card.className='lesson-card';
+  let html=`<div class="lesson-tag">${step.tag}</div><div class="lesson-title">${step.title}</div>`;
+  if(step.body) html+=`<div class="lesson-body">${step.body}</div>`;
+  if(step.diagram) html+=buildDiagram(step.diagram);
+  if(step.code) html+=`<div class="code-block">${colorizeCode(step.code)}</div>`;
+  card.innerHTML=html;container.appendChild(card);
+  btn.textContent='CONTINUE';btn.disabled=false;btn.onclick=nextStep;
+}
+
+function renderMCQ(step,container,btn){
+  const card=document.createElement('div');card.className='question-card';
+  const choices=step.choices.map((c,i)=>`<button class="choice-btn" onclick="selectChoice(${i})" id="choice-${i}"><span class="choice-letter">${['A','B','C','D'][i]}</span>${c}</button>`).join('');
+  card.innerHTML=`<div class="wgu-badge">🎓 WGU C949</div><div class="question-prompt">${step.prompt}</div><div class="choices">${choices}</div><div class="feedback" id="feedback"></div>`;
+  container.appendChild(card);
+}
+
+function selectChoice(i){
+  if(answered)return;selectedChoice=i;
+  document.querySelectorAll('.choice-btn').forEach((b,idx)=>{
+    b.style.borderColor=idx===i?'var(--accent)':'';
+    b.style.background=idx===i?'rgba(124,58,237,.12)':'';
+  });
+  document.getElementById('check-btn').disabled=false;
+}
+
+function renderFill(step,container,btn){
+  const card=document.createElement('div');card.className='question-card';
+  card.innerHTML=`<div class="wgu-badge">🎓 WGU C949</div><div class="question-prompt">${step.prompt}</div><div class="fill-wrap">Answer: <input class="fill-input" id="fill-input" placeholder="type here..." oninput="document.getElementById('check-btn').disabled=this.value.trim()===''"></div><div class="feedback" id="feedback"></div>`;
+  container.appendChild(card);
+  setTimeout(()=>document.getElementById('fill-input')?.focus(),100);
+}
+
+function renderMatch(step,container,btn){
+  matchPairs=step.pairs.map((p,i)=>({...p,id:i,matched:false}));
+  const shuffledRight=[...matchPairs].sort(()=>Math.random()-.5);
+  const card=document.createElement('div');card.className='question-card';
+  const leftCol=matchPairs.map(p=>`<div class="match-item" id="left-${p.id}" onclick="matchClick('left',${p.id})">${p.left}</div>`).join('');
+  const rightCol=shuffledRight.map(p=>`<div class="match-item" id="right-${p.id}" onclick="matchClick('right',${p.id})">${p.right}</div>`).join('');
+  card.innerHTML=`<div class="wgu-badge">🎓 WGU C949</div><div class="question-prompt">${step.prompt}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div><div class="match-col-label">TERM</div>${leftCol}</div><div><div class="match-col-label">DEFINITION</div>${rightCol}</div></div><div class="feedback" id="feedback"></div>`;
+  container.appendChild(card);btn.disabled=true;
+}
+
+function matchClick(side,id){
+  if(matchState.matched.includes(id))return;
+  if(side==='left'){
+    if(matchState.leftSel!==null) document.getElementById(`left-${matchState.leftSel}`)?.classList.remove('selected');
+    matchState.leftSel=id;document.getElementById(`left-${id}`).classList.add('selected');
+  } else {
+    if(matchState.rightSel!==null) document.getElementById(`right-${matchState.rightSel}`)?.classList.remove('selected');
+    matchState.rightSel=id;document.getElementById(`right-${id}`).classList.add('selected');
+  }
+  if(matchState.leftSel!==null&&matchState.rightSel!==null){
+    const lId=matchState.leftSel,rId=matchState.rightSel;
+    if(lId===rId){
+      document.getElementById(`left-${lId}`).classList.replace('selected','matched');
+      document.getElementById(`right-${rId}`).classList.replace('selected','matched');
+      matchState.matched.push(lId);matchState.leftSel=null;matchState.rightSel=null;
+      if(matchState.matched.length===matchPairs.length){
+        answered=true;
+        showFeedback(true,currentModule.steps[currentStep].feedback_correct);
+        const btn=document.getElementById('check-btn');
+        btn.textContent='CONTINUE';btn.className='check-btn next';btn.disabled=false;btn.onclick=nextStep;
+      }
+    } else {
+      document.getElementById(`left-${lId}`)?.classList.add('wrong-match');
+      document.getElementById(`right-${rId}`)?.classList.add('wrong-match');
+      setTimeout(()=>{
+        document.getElementById(`left-${lId}`)?.classList.remove('selected','wrong-match');
+        document.getElementById(`right-${rId}`)?.classList.remove('selected','wrong-match');
+        matchState.leftSel=null;matchState.rightSel=null;
+      },400);
+    }
+  }
+}
+
+function handleCheck(){
+  if(answered)return;
+  const step=currentModule.steps[currentStep];
+  if(step.type==='mcq'){
+    answered=true;
+    const correct=selectedChoice===step.correct;
+    document.querySelectorAll('.choice-btn').forEach((b,i)=>{
+      b.onclick=null;
+      if(i===step.correct)b.classList.add('correct');
+      else if(i===selectedChoice&&!correct)b.classList.add('wrong');
+    });
+    if(!correct)loseHeart();
+    showFeedback(correct,correct?step.feedback_correct:step.feedback_wrong);
+    advanceBtn();
+  } else if(step.type==='fill'){
+    answered=true;
+    const val=document.getElementById('fill-input').value.trim().toLowerCase();
+    const correct=step.accepts.map(a=>a.toLowerCase()).includes(val);
+    const input=document.getElementById('fill-input');
+    input.classList.add(correct?'correct':'wrong');input.disabled=true;
+    if(!correct){loseHeart();input.value=step.answer;}
+    showFeedback(correct,correct?step.feedback_correct:step.feedback_wrong);
+    advanceBtn();
+  }
+}
+
+function advanceBtn(){
+  const btn=document.getElementById('check-btn');
+  btn.textContent='CONTINUE';btn.className='check-btn next';btn.disabled=false;btn.onclick=nextStep;
+}
+
+function showFeedback(correct,text){
+  const fb=document.getElementById('feedback');
+  if(!fb)return;
+  fb.className='feedback '+(correct?'correct-fb':'wrong-fb');fb.innerHTML=text;
+}
+
+function loseHeart(){
+  hearts=Math.max(0,hearts-1);
+  document.getElementById('hearts-display').textContent='❤️'.repeat(hearts)+'🖤'.repeat(3-hearts);
+}
+
+function nextStep(){
+  currentStep++;
+  if(currentStep>=currentModule.steps.length) completeLesson();
+  else{matchState={leftSel:null,rightSel:null,matched:[]};renderStep();}
+}
+
+function completeLesson(){
+  const alreadyDone=state.completedModules.includes(currentModule.id);
+  if(!alreadyDone){
+    state.completedModules.push(currentModule.id);
+    state.xp+=currentModule.xp;saveState();
+  }
+  showScreen('complete-screen');
+  if(reviewMode){
+    document.getElementById('complete-emoji').textContent='🔁';
+    document.getElementById('complete-title').textContent='Review Complete!';
+    document.getElementById('complete-sub').textContent=`${currentModule.title} — reviewed all ${currentModule.steps.length} steps`;
+    document.getElementById('xp-earned').textContent='Review Done ✓';
+    document.getElementById('xp-earned').style.fontSize='1.4rem';
+  } else {
+    document.getElementById('complete-emoji').textContent=hearts===3?'🏆':hearts===2?'⭐':'✅';
+    document.getElementById('complete-title').textContent=hearts===3?'Perfect Score!':'Lesson Complete!';
+    document.getElementById('complete-sub').textContent=`${currentModule.title} — ${currentModule.steps.length} steps done`;
+    document.getElementById('xp-earned').textContent=alreadyDone?'Already earned XP':`+${currentModule.xp} XP`;
+    document.getElementById('xp-earned').style.fontSize='2.5rem';
+  }
+}
+
+function showMap(){
+  matchState={leftSel:null,rightSel:null,matched:[]};
+  showScreen('map-screen');buildMap();
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';});
+  const el=document.getElementById(id);el.classList.add('active');el.style.display='flex';
+}
+
+// ── INIT ──
+(function init(){
+  renderSavedUsers();
+  showScreen('name-screen');
+  setTimeout(()=>document.getElementById('name-input')?.focus(), 300);
+})();
+</script>
+</body>
+</html>
