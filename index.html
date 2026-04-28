@@ -93,6 +93,8 @@ header{width:100%;max-width:480px;padding:20px 20px 0;display:flex;align-items:c
 .name-btn{width:100%;padding:16px;border-radius:14px;border:none;background:var(--accent);color:white;font-family:var(--sans);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;margin-bottom:24px;}
 .name-btn:hover{background:#6d28d9;transform:translateY(-1px);}
 .name-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none;}
+.name-disclaimer{width:100%;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.18);border-radius:12px;padding:12px 14px;font-size:.75rem;color:var(--muted);line-height:1.6;text-align:center;margin-bottom:20px;}
+.name-disclaimer strong{color:var(--text);}
 .saved-users{width:100%;margin-top:4px;}
 .saved-label{font-size:.68rem;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;text-align:center;}
 .user-chip{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;cursor:pointer;transition:all .2s;}
@@ -145,6 +147,9 @@ header{width:100%;max-width:480px;padding:20px 20px 0;display:flex;align-items:c
       oninput="validateNameForm()"
       onkeydown="if(event.key==='Enter')startAsUser()">
     <button class="name-btn" id="name-start-btn" onclick="startAsUser()" disabled>LET'S GO →</button>
+    <div class="name-disclaimer">
+      <span aria-hidden="true">🔒</span> Your name and email are used <strong>only</strong> to track your progress and display your score on the leaderboard. No personal information is ever shared with third parties. You will never be contacted for any reason. This app was built for educational purposes and is completely <strong>free to use</strong>.
+    </div>
     <div class="saved-users" id="saved-users-list"></div>
   </div>
 </div>
