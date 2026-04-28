@@ -129,7 +129,6 @@ header{width:100%;max-width:480px;padding:20px 20px 0;display:flex;align-items:c
 .theme-toggle:hover{border-color:var(--accent2);color:var(--accent2);}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
-<script src="config.js"></script>
 </head>
 <body>
 
@@ -764,12 +763,8 @@ function checkStreak(){
   document.getElementById('streak-count').textContent=state.streak;
 }
 
-// ── AIRTABLE SYNC ──
-// AT_PAT is loaded from config.js (gitignored)
-const AT_BASE    = 'appIZnxctAFWm0N62';
-const AT_TABLE   = 'tbl8YYTQL5c93YgfJ';
-const AT_URL     = `https://api.airtable.com/v0/${AT_BASE}/${AT_TABLE}`;
-const AT_HEADERS = { 'Authorization': `Bearer ${AT_PAT}`, 'Content-Type': 'application/json' };
+// ── AIRTABLE SYNC ── (proxied through /.netlify/functions/airtable)
+const PROXY = '/.netlify/functions/airtable';
 
 // Find existing Airtable record ID for this user (stored locally after first push)
 function getRecordId(){ return localStorage.getItem(`c949_${currentUser}_atRecordId`) || null; }
@@ -786,40 +781,30 @@ async function pushToLeaderboard(){
       'Last Active':       new Date().toLocaleDateString('en-US'),
       'User Key':          `${currentUser}-${getEmail(currentUser)}`
     };
-
+    const json = { headers: { 'Content-Type': 'application/json' } };
     const recordId = getRecordId();
 
     if(recordId){
-      // PATCH existing record
-      await fetch(`${AT_URL}/${recordId}`, {
-        method: 'PATCH',
-        headers: AT_HEADERS,
-        body: JSON.stringify({ fields })
+      await fetch(`${PROXY}?recordId=${recordId}`, {
+        method: 'PATCH', ...json, body: JSON.stringify({ fields })
       });
     } else {
-      // Check if a record for this email already exists
       const email = getEmail(currentUser);
       const searchResp = await fetch(
-        `${AT_URL}?filterByFormula=${encodeURIComponent(`{Email}="${email}"`)}`,
-        { headers: AT_HEADERS }
+        `${PROXY}?filterByFormula=${encodeURIComponent(`{Email}="${email}"`)}`,
+        { method: 'GET' }
       );
       const searchData = await searchResp.json();
 
       if(searchData.records && searchData.records.length > 0){
-        // Record exists from a previous device — store ID and patch
         const existingId = searchData.records[0].id;
         setRecordId(existingId);
-        await fetch(`${AT_URL}/${existingId}`, {
-          method: 'PATCH',
-          headers: AT_HEADERS,
-          body: JSON.stringify({ fields })
+        await fetch(`${PROXY}?recordId=${existingId}`, {
+          method: 'PATCH', ...json, body: JSON.stringify({ fields })
         });
       } else {
-        // Brand new user — create record
-        const createResp = await fetch(AT_URL, {
-          method: 'POST',
-          headers: AT_HEADERS,
-          body: JSON.stringify({ fields })
+        const createResp = await fetch(PROXY, {
+          method: 'POST', ...json, body: JSON.stringify({ fields })
         });
         const created = await createResp.json();
         if(created.id) setRecordId(created.id);
@@ -833,8 +818,8 @@ async function loadLeaderboard(){
   el.innerHTML='<div class="lb-loading">Loading scores...</div>';
   try {
     const resp = await fetch(
-      `${AT_URL}?sort[0][field]=XP&sort[0][direction]=desc&maxRecords=50`,
-      { headers: AT_HEADERS }
+      `${PROXY}?sort[0][field]=XP&sort[0][direction]=desc&maxRecords=50`,
+      { method: 'GET' }
     );
     const data = await resp.json();
 
